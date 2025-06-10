@@ -1,4 +1,3 @@
-
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from "date-fns";
 import { es } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -117,13 +116,12 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
                 return (
                   <div 
                     key={`${dayIndex}-${time}`} 
-                    className="min-h-12 p-1 border-l border-b hover:bg-gray-50 cursor-pointer"
-                    onClick={() => onDateChange(date)}
+                    className="min-h-12 p-1 border-l border-b hover:bg-gray-50"
                   >
                     {appointments.map((appointment) => (
                       <div
                         key={appointment.id}
-                        className={`dental-appointment-slot appointment-${appointment.type} mb-1 text-xs`}
+                        className={`dental-appointment-slot appointment-${appointment.type} mb-1 text-xs cursor-pointer`}
                       >
                         <div className="font-medium">{appointment.title}</div>
                         {appointment.patient && (
