@@ -22,7 +22,7 @@ export function MiniCalendar({ selectedDate, onDateSelect }: MiniCalendarProps) 
           mode="single"
           selected={selectedDate}
           onSelect={(date) => date && onDateSelect(date)}
-          className="rounded-none border-none p-3 pointer-events-auto"
+          className="rounded-none border-none p-3"
           locale={es}
         />
       </CardContent>

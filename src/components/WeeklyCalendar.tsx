@@ -1,3 +1,4 @@
+
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from "date-fns";
 import { es } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -19,7 +20,6 @@ interface WeeklyCalendarProps {
   onDateChange: (date: Date) => void;
 }
 
-// Datos de ejemplo de turnos
 const sampleAppointments: Appointment[] = [
   { id: "1", title: "Consulta General", time: "09:00", duration: 1, type: "decoraciones", patient: "Juan Pérez", doctor: "Dr. García" },
   { id: "2", title: "Limpieza", time: "10:00", duration: 1, type: "turnos", patient: "María López", doctor: "Dr. García" },
@@ -30,7 +30,7 @@ const sampleAppointments: Appointment[] = [
 ];
 
 const timeSlots = Array.from({ length: 12 }, (_, i) => {
-  const hour = i + 8; // Start at 8:00 AM
+  const hour = i + 8;
   return `${hour.toString().padStart(2, '0')}:00`;
 });
 
@@ -49,7 +49,6 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
   };
 
   const getAppointmentsForDayAndTime = (dayIndex: number, time: string) => {
-    // Para demo, mostramos algunos turnos de ejemplo
     if (dayIndex >= 1 && dayIndex <= 5 && Math.random() > 0.7) {
       const randomAppointment = sampleAppointments[Math.floor(Math.random() * sampleAppointments.length)];
       return [randomAppointment];
@@ -79,7 +78,6 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
           </div>
         </div>
 
-        {/* Encabezado de la semana */}
         <div className="grid grid-cols-8 gap-0 border-b">
           <div className="p-2"></div>
           {weekDates.map((date, index) => (
@@ -99,17 +97,14 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
         </div>
       </div>
 
-      {/* Grilla del calendario */}
       <div className="overflow-auto max-h-[500px]">
         <div className="grid grid-cols-8 gap-0">
           {timeSlots.map((time) => (
             <>
-              {/* Columna de horas */}
               <div key={`time-${time}`} className="p-2 text-xs text-gray-500 text-right border-b bg-gray-50">
                 {time}
               </div>
               
-              {/* Columnas de días */}
               {weekDates.map((date, dayIndex) => {
                 const appointments = getAppointmentsForDayAndTime(dayIndex, time);
                 

@@ -10,27 +10,21 @@ const Index = () => {
 
   return (
     <div className="h-screen flex">
-      {/* Espacio reservado para sidebar - completamente vacío */}
       <div className="w-16"></div>
       
       <div className="flex-1 flex flex-col">
-        {/* Espacio reservado para header - completamente vacío */}
         <div className="h-16"></div>
         
-        {/* Contenido principal */}
         <div className="flex-1 flex gap-6 p-6 mx-0 my-[80px]">
           <div className="flex flex-col gap-4">
-            {/* Botón Agendar turnos */}
             <Button className="w-full">
               <Plus className="w-4 h-4 mr-2" />
               Agendar turnos
             </Button>
             
-            {/* Mini calendario */}
             <MiniCalendar selectedDate={selectedDate} onDateSelect={setSelectedDate} />
           </div>
           
-          {/* Calendario semanal */}
           <WeeklyCalendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
         </div>
       </div>
