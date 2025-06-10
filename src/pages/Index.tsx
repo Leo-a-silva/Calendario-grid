@@ -1,15 +1,11 @@
-
 import { useState } from "react";
 import { MiniCalendar } from "@/components/MiniCalendar";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-
-  return (
-    <div className="h-screen flex">
+  return <div className="h-screen flex">
       {/* Espacio reservado para sidebar */}
       <div className="w-16 bg-primary"></div>
       
@@ -18,7 +14,7 @@ const Index = () => {
         <div className="h-16 bg-white border-b"></div>
         
         {/* Contenido principal */}
-        <div className="flex-1 flex gap-6 p-6">
+        <div className="flex-1 flex gap-6 p-6 mx-0 my-[80px]">
           <div className="flex flex-col gap-4">
             {/* Botón Agendar turnos */}
             <Button className="w-full">
@@ -27,21 +23,13 @@ const Index = () => {
             </Button>
             
             {/* Mini calendario */}
-            <MiniCalendar 
-              selectedDate={selectedDate}
-              onDateSelect={setSelectedDate}
-            />
+            <MiniCalendar selectedDate={selectedDate} onDateSelect={setSelectedDate} />
           </div>
           
           {/* Calendario semanal */}
-          <WeeklyCalendar 
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
-          />
+          <WeeklyCalendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
