@@ -1,17 +1,21 @@
+
 import { useState } from "react";
 import { MiniCalendar } from "@/components/MiniCalendar";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  return <div className="h-screen flex">
-      {/* Espacio reservado para sidebar */}
-      <div className="w-16 bg-primary"></div>
+
+  return (
+    <div className="h-screen flex">
+      {/* Espacio reservado para sidebar - completamente vacío */}
+      <div className="w-16"></div>
       
       <div className="flex-1 flex flex-col">
-        {/* Espacio reservado para header */}
-        <div className="h-16 bg-white border-b"></div>
+        {/* Espacio reservado para header - completamente vacío */}
+        <div className="h-16"></div>
         
         {/* Contenido principal */}
         <div className="flex-1 flex gap-6 p-6 mx-0 my-[80px]">
@@ -30,6 +34,8 @@ const Index = () => {
           <WeeklyCalendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
