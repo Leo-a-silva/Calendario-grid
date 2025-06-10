@@ -2,28 +2,43 @@
 import { useState } from "react";
 import { MiniCalendar } from "@/components/MiniCalendar";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   return (
-    <div className="h-screen flex flex-col">
-      <header className="bg-white border-b p-4 flex items-center gap-4">
-        <SidebarTrigger />
-        <h1 className="text-xl font-semibold text-gray-900">Calendario - Agenda Semanal</h1>
-      </header>
+    <div className="h-screen flex">
+      {/* Espacio reservado para sidebar */}
+      <div className="w-16 bg-primary"></div>
       
-      <div className="flex-1 flex gap-6 p-6 overflow-hidden">
-        <MiniCalendar 
-          selectedDate={selectedDate}
-          onDateSelect={setSelectedDate}
-        />
+      <div className="flex-1 flex flex-col">
+        {/* Espacio reservado para header */}
+        <div className="h-16 bg-white border-b"></div>
         
-        <WeeklyCalendar 
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-        />
+        {/* Contenido principal */}
+        <div className="flex-1 flex gap-6 p-6">
+          <div className="flex flex-col gap-4">
+            {/* Botón Agendar turnos */}
+            <Button className="w-full">
+              <Plus className="w-4 h-4 mr-2" />
+              Agendar turnos
+            </Button>
+            
+            {/* Mini calendario */}
+            <MiniCalendar 
+              selectedDate={selectedDate}
+              onDateSelect={setSelectedDate}
+            />
+          </div>
+          
+          {/* Calendario semanal */}
+          <WeeklyCalendar 
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+          />
+        </div>
       </div>
     </div>
   );

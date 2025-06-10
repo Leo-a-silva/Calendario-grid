@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
@@ -13,7 +12,7 @@ interface MiniCalendarProps {
 export function MiniCalendar({ selectedDate, onDateSelect }: MiniCalendarProps) {
   return (
     <Card className="w-80">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-gray-700">
           {format(selectedDate, "MMMM yyyy", { locale: es })}
         </CardTitle>

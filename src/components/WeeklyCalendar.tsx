@@ -50,8 +50,7 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
   };
 
   const getAppointmentsForDayAndTime = (dayIndex: number, time: string) => {
-    // This would typically filter appointments based on date and time
-    // For demo purposes, we'll show some sample appointments
+    // Para demo, mostramos algunos turnos de ejemplo
     if (dayIndex >= 1 && dayIndex <= 5 && Math.random() > 0.7) {
       const randomAppointment = sampleAppointments[Math.floor(Math.random() * sampleAppointments.length)];
       return [randomAppointment];
@@ -81,7 +80,7 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
           </div>
         </div>
 
-        {/* Week header */}
+        {/* Encabezado de la semana */}
         <div className="grid grid-cols-8 gap-0 border-b">
           <div className="p-2"></div>
           {weekDates.map((date, index) => (
@@ -101,17 +100,17 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
         </div>
       </div>
 
-      {/* Calendar grid */}
-      <div className="overflow-auto max-h-96">
+      {/* Grilla del calendario */}
+      <div className="overflow-auto max-h-[500px]">
         <div className="grid grid-cols-8 gap-0">
           {timeSlots.map((time) => (
             <>
-              {/* Time column */}
-              <div key={`time-${time}`} className="p-2 text-xs text-gray-500 text-right border-b">
+              {/* Columna de horas */}
+              <div key={`time-${time}`} className="p-2 text-xs text-gray-500 text-right border-b bg-gray-50">
                 {time}
               </div>
               
-              {/* Day columns */}
+              {/* Columnas de días */}
               {weekDates.map((date, dayIndex) => {
                 const appointments = getAppointmentsForDayAndTime(dayIndex, time);
                 
@@ -119,11 +118,12 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
                   <div 
                     key={`${dayIndex}-${time}`} 
                     className="min-h-12 p-1 border-l border-b hover:bg-gray-50 cursor-pointer"
+                    onClick={() => onDateChange(date)}
                   >
                     {appointments.map((appointment) => (
                       <div
                         key={appointment.id}
-                        className={`dental-appointment-slot appointment-${appointment.type} mb-1`}
+                        className={`dental-appointment-slot appointment-${appointment.type} mb-1 text-xs`}
                       >
                         <div className="font-medium">{appointment.title}</div>
                         {appointment.patient && (
