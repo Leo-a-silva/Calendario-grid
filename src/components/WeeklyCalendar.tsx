@@ -21,16 +21,11 @@ interface WeeklyCalendarProps {
 }
 
 const sampleAppointments: Appointment[] = [
-  { id: "1", title: "Consulta General", time: "09:00", duration: 1, type: "decoraciones", patient: "Juan Pérez", doctor: "Dr. García" },
-  { id: "2", title: "Limpieza", time: "10:00", duration: 1, type: "turnos", patient: "María López", doctor: "Dr. García" },
-  { id: "3", title: "Ortodoncia", time: "11:00", duration: 2, type: "turnos", patient: "Carlos Ruiz", doctor: "Dr. Martínez" },
-  { id: "4", title: "Revisión", time: "14:00", duration: 1, type: "decoraciones", patient: "Ana Torres", doctor: "Dr. García" },
-  { id: "5", title: "Endodoncia", time: "15:00", duration: 2, type: "turnos", patient: "Pedro Sánchez", doctor: "Dr. Martínez" },
-  { id: "6", title: "Consulta", time: "16:00", duration: 1, type: "tareas", patient: "Laura Díaz", doctor: "Dr. García" },
+  { id: "1", title: "Consulta General", time: "09:00", duration: 1, type: "turnos", patient: "Juan Pérez", doctor: "Dr. García" },
 ];
 
 const timeSlots = Array.from({ length: 12 }, (_, i) => {
-  const hour = i + 8;
+  const hour = i + 9;
   return `${hour.toString().padStart(2, '0')}:00`;
 });
 
