@@ -10,7 +10,7 @@ interface Appointment {
   title: string;
   time: string;
   duration: number;
-  type: "decoraciones" | "turnos" | "tareas" | "inhabilitado";
+  type: "Recordatorio" | "turnos" | "tareas" | "inhabilitado";
   patient?: string;
   doctor?: string;
 }
@@ -24,6 +24,7 @@ const sampleAppointments: Appointment[] = [
   { id: "1", title: "Consulta General", time: "09:00", duration: 1, type: "turnos", patient: "Juan Pérez", doctor: "Dr. García" },
 ];
 
+//configuración de agenda semanal (horario de atencion)
 const timeSlots = Array.from({ length: 12 }, (_, i) => {
   const hour = i + 9;
   return `${hour.toString().padStart(2, '0')}:00`;
