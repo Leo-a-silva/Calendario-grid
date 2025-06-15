@@ -24,238 +24,174 @@ export function ToothComponent({ number, procedures, onClick }: ToothComponentPr
     }
   };
 
-  // Determinar si es diente anterior, premolar o molar basado en el número
-  const getToothType = (num: number): 'anterior' | 'premolar' | 'molar' => {
+  // Determinar si es diente superior o inferior
+  const isUpper = number >= 11 && number <= 28 || number >= 51 && number <= 65;
+
+  // Determinar el tipo de diente basado en el número
+  const getToothType = (num: number): 'incisor' | 'canine' | 'premolar' | 'molar' => {
     const lastDigit = num % 10;
-    if (lastDigit >= 1 && lastDigit <= 3) return 'anterior';
-    if (lastDigit >= 4 && lastDigit <= 5) return 'premolar';
+    if (lastDigit === 1 || lastDigit === 2) return 'incisor';
+    if (lastDigit === 3) return 'canine';
+    if (lastDigit === 4 || lastDigit === 5) return 'premolar';
     return 'molar';
   };
 
   const toothType = getToothType(number);
 
-  // Determinar si es diente superior o inferior
-  const isUpper = number >= 11 && number <= 28 || number >= 51 && number <= 65;
+  const renderToothDrawing = () => {
+    const commonProps = {
+      fill: "#e5e7eb",
+      stroke: "#9ca3af",
+      strokeWidth: "1"
+    };
 
-  const renderToothSegments = () => {
-    if (toothType === 'anterior') {
+    if (toothType === 'incisor') {
       return (
-        <g>
-          {/* Forma base del diente anterior */}
-          <path
-            d="M25 10 C30 10, 35 12, 35 18 L35 45 C35 50, 30 52, 25 52 C20 52, 15 50, 15 45 L15 18 C15 12, 20 10, 25 10 Z"
-            fill="#f3f4f6"
-            stroke="#374151"
-            strokeWidth="1"
-          />
-          
-          {/* Segmento Vestibular */}
-          <path
-            d="M25 10 C30 10, 35 12, 35 18 L32 20 C30 15, 27 12, 25 12 C23 12, 20 15, 18 20 L15 18 C15 12, 20 10, 25 10 Z"
-            fill={getSegmentColor('vestibular')}
-            stroke="#374151"
-            strokeWidth="0.5"
-            className="cursor-pointer hover:opacity-80"
-            onClick={onClick}
-          />
-          
-          {/* Segmento Mesial */}
-          <path
-            d="M15 18 L18 20 L20 35 L15 45 C15 35, 15 25, 15 18 Z"
-            fill={getSegmentColor('mesial')}
-            stroke="#374151"
-            strokeWidth="0.5"
-            className="cursor-pointer hover:opacity-80"
-            onClick={onClick}
-          />
-          
-          {/* Segmento Distal */}
-          <path
-            d="M35 18 L32 20 L30 35 L35 45 C35 35, 35 25, 35 18 Z"
-            fill={getSegmentColor('distal')}
-            stroke="#374151"
-            strokeWidth="0.5"
-            className="cursor-pointer hover:opacity-80"
-            onClick={onClick}
-          />
-          
-          {/* Segmento Oclusal/Incisal */}
-          <path
-            d="M18 20 L32 20 L30 35 L20 35 Z"
-            fill={getSegmentColor('oclusal')}
-            stroke="#374151"
-            strokeWidth="0.5"
-            className="cursor-pointer hover:opacity-80"
-            onClick={onClick}
-          />
-          
-          {/* Segmento Lingual */}
-          <path
-            d="M20 35 L30 35 L32 45 C30 48, 27 50, 25 50 C23 50, 20 48, 18 45 L20 35 Z"
-            fill={getSegmentColor('lingual')}
-            stroke="#374151"
-            strokeWidth="0.5"
-            className="cursor-pointer hover:opacity-80"
-            onClick={onClick}
-          />
-        </g>
+        <path
+          d="M15 5 C20 5, 25 5, 30 5 C32 5, 35 7, 35 12 L35 35 C35 42, 30 45, 22.5 45 C15 45, 10 42, 10 35 L10 12 C10 7, 13 5, 15 5 Z"
+          {...commonProps}
+        />
+      );
+    }
+
+    if (toothType === 'canine') {
+      return (
+        <path
+          d="M15 8 C18 5, 22 3, 22.5 3 C23 3, 27 5, 30 8 C33 10, 35 15, 35 20 L35 35 C35 42, 30 45, 22.5 45 C15 45, 10 42, 10 35 L10 20 C10 15, 12 10, 15 8 Z"
+          {...commonProps}
+        />
       );
     }
 
     if (toothType === 'premolar') {
       return (
-        <g>
-          {/* Forma base del premolar */}
-          <ellipse
-            cx="25"
-            cy="31"
-            rx="12"
-            ry="18"
-            fill="#f3f4f6"
-            stroke="#374151"
-            strokeWidth="1"
-          />
-          
-          {/* Segmento Vestibular */}
-          <path
-            d="M25 13 C30 13, 35 16, 37 22 L32 20 C30 16, 27 15, 25 15 C23 15, 20 16, 18 20 L13 22 C15 16, 20 13, 25 13 Z"
-            fill={getSegmentColor('vestibular')}
-            stroke="#374151"
-            strokeWidth="0.5"
-            className="cursor-pointer hover:opacity-80"
-            onClick={onClick}
-          />
-          
-          {/* Segmento Mesial */}
-          <path
-            d="M13 22 L18 20 L20 31 L18 42 L13 40 C11 35, 11 27, 13 22 Z"
-            fill={getSegmentColor('mesial')}
-            stroke="#374151"
-            strokeWidth="0.5"
-            className="cursor-pointer hover:opacity-80"
-            onClick={onClick}
-          />
-          
-          {/* Segmento Distal */}
-          <path
-            d="M37 22 L32 20 L30 31 L32 42 L37 40 C39 35, 39 27, 37 22 Z"
-            fill={getSegmentColor('distal')}
-            stroke="#374151"
-            strokeWidth="0.5"
-            className="cursor-pointer hover:opacity-80"
-            onClick={onClick}
-          />
-          
-          {/* Segmento Oclusal */}
-          <ellipse
-            cx="25"
-            cy="26"
-            rx="7"
-            ry="6"
-            fill={getSegmentColor('oclusal')}
-            stroke="#374151"
-            strokeWidth="0.5"
-            className="cursor-pointer hover:opacity-80"
-            onClick={onClick}
-          />
-          
-          {/* Segmento Lingual */}
-          <path
-            d="M18 42 L32 42 L37 40 C35 45, 30 49, 25 49 C20 49, 15 45, 13 40 L18 42 Z"
-            fill={getSegmentColor('lingual')}
-            stroke="#374151"
-            strokeWidth="0.5"
-            className="cursor-pointer hover:opacity-80"
-            onClick={onClick}
-          />
-        </g>
+        <ellipse
+          cx="22.5"
+          cy="25"
+          rx="12"
+          ry="15"
+          {...commonProps}
+        />
       );
     }
 
     // Molar
     return (
+      <rect
+        x="8"
+        y="12"
+        width="29"
+        height="26"
+        rx="6"
+        ry="6"
+        {...commonProps}
+      />
+    );
+  };
+
+  const renderCircleSegments = () => {
+    const centerX = 22.5;
+    const centerY = 25;
+    const radius = 15;
+
+    return (
       <g>
-        {/* Forma base del molar */}
-        <rect
-          x="12"
-          y="16"
-          width="26"
-          height="28"
-          rx="8"
-          ry="8"
-          fill="#f3f4f6"
-          stroke="#374151"
+        {/* Círculo base */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={radius}
+          fill="white"
+          stroke="#9ca3af"
           strokeWidth="1"
         />
         
-        {/* Segmento Vestibular */}
+        {/* Segmento Superior (Vestibular) */}
         <path
-          d="M20 16 C25 16, 30 16, 30 16 L32 20 L28 22 L22 22 L18 20 L20 16 Z"
+          d={`M ${centerX} ${centerY} L ${centerX} ${centerY - radius} A ${radius} ${radius} 0 0 1 ${centerX + radius * 0.707} ${centerY - radius * 0.707} Z`}
           fill={getSegmentColor('vestibular')}
-          stroke="#374151"
+          stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
-          onClick={onClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
         />
         
-        {/* Segmento Mesial */}
+        {/* Segmento Derecho (Distal) */}
         <path
-          d="M12 24 L18 20 L22 22 L20 30 L18 38 L12 36 C12 32, 12 28, 12 24 Z"
-          fill={getSegmentColor('mesial')}
-          stroke="#374151"
-          strokeWidth="0.5"
-          className="cursor-pointer hover:opacity-80"
-          onClick={onClick}
-        />
-        
-        {/* Segmento Distal */}
-        <path
-          d="M38 24 L32 20 L28 22 L30 30 L32 38 L38 36 C38 32, 38 28, 38 24 Z"
+          d={`M ${centerX} ${centerY} L ${centerX + radius * 0.707} ${centerY - radius * 0.707} A ${radius} ${radius} 0 0 1 ${centerX + radius * 0.707} ${centerY + radius * 0.707} Z`}
           fill={getSegmentColor('distal')}
-          stroke="#374151"
+          stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
-          onClick={onClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
         />
         
-        {/* Segmento Oclusal */}
-        <rect
-          x="22"
-          y="22"
-          width="6"
-          height="16"
-          rx="2"
-          ry="2"
-          fill={getSegmentColor('oclusal')}
-          stroke="#374151"
-          strokeWidth="0.5"
-          className="cursor-pointer hover:opacity-80"
-          onClick={onClick}
-        />
-        
-        {/* Segmento Lingual */}
+        {/* Segmento Inferior (Lingual) */}
         <path
-          d="M18 38 L32 38 L38 36 C36 40, 32 44, 25 44 C18 44, 14 40, 12 36 L18 38 Z"
+          d={`M ${centerX} ${centerY} L ${centerX + radius * 0.707} ${centerY + radius * 0.707} A ${radius} ${radius} 0 0 1 ${centerX - radius * 0.707} ${centerY + radius * 0.707} Z`}
           fill={getSegmentColor('lingual')}
-          stroke="#374151"
+          stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
-          onClick={onClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+        />
+        
+        {/* Segmento Izquierdo (Mesial) */}
+        <path
+          d={`M ${centerX} ${centerY} L ${centerX - radius * 0.707} ${centerY + radius * 0.707} A ${radius} ${radius} 0 0 1 ${centerX - radius * 0.707} ${centerY - radius * 0.707} Z`}
+          fill={getSegmentColor('mesial')}
+          stroke="#9ca3af"
+          strokeWidth="0.5"
+          className="cursor-pointer hover:opacity-80"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+        />
+        
+        {/* Segmento Central (Oclusal) */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={radius * 0.4}
+          fill={getSegmentColor('oclusal')}
+          stroke="#9ca3af"
+          strokeWidth="0.5"
+          className="cursor-pointer hover:opacity-80"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
         />
       </g>
     );
   };
 
   return (
-    <div className="flex flex-col items-center space-y-1">
+    <div className="flex flex-col items-center space-y-2">
+      {/* Dibujo del diente arriba */}
+      <svg width="45" height="50" viewBox="0 0 45 50" className="hover:opacity-90">
+        {renderToothDrawing()}
+      </svg>
+      
+      {/* Círculo con segmentos abajo */}
       <div className="relative">
-        <svg width="50" height="60" viewBox="0 0 50 60" className="hover:opacity-90">
-          {renderToothSegments()}
+        <svg width="45" height="50" viewBox="0 0 45 50" className="hover:opacity-90">
+          {renderCircleSegments()}
         </svg>
         
         {/* Número del diente */}
-        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-          <span className="text-xs font-semibold text-gray-700 bg-white px-1 rounded">{number}</span>
+        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
+          <span className="text-xs font-semibold text-blue-600 bg-white px-1 rounded border">{number}</span>
         </div>
       </div>
     </div>

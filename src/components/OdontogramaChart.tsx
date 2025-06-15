@@ -76,12 +76,12 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Header con filtros y selector */}
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold">Odontograma</h2>
+        
         <div className="flex items-center space-x-6">
-          <h2 className="text-xl font-bold">Odontograma</h2>
-          
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Checkbox 
@@ -113,24 +113,24 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
               <label htmlFor="pendientes" className="text-sm">Trabajo pendiente</label>
             </div>
           </div>
-        </div>
 
-        <Select defaultValue={denticionType}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Seleccionar dentición" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="permanente">Dentición permanente</SelectItem>
-            <SelectItem value="primaria">Dentición primaria</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select defaultValue={denticionType}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Seleccionar dentición" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="permanente">Dentición permanente</SelectItem>
+              <SelectItem value="primaria">Dentición primaria</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Contenedor del odontograma */}
-      <div className="bg-gray-50 p-8 rounded-lg border">
+      <div className="bg-white p-6 rounded-lg border shadow-sm">
         {/* Dientes superiores */}
-        <div className="flex justify-center mb-12">
-          <div className="flex gap-3">
+        <div className="flex justify-center mb-8">
+          <div className="flex gap-2">
             {teethNumbers.superior.map((toothNumber) => (
               <ToothComponent
                 key={toothNumber}
@@ -143,11 +143,11 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
         </div>
 
         {/* Línea separadora */}
-        <div className="border-t border-gray-300 my-8"></div>
+        <div className="border-t border-gray-300 my-6"></div>
 
         {/* Dientes inferiores */}
         <div className="flex justify-center">
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             {teethNumbers.inferior.map((toothNumber) => (
               <ToothComponent
                 key={toothNumber}
