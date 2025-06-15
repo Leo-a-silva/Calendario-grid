@@ -21,31 +21,24 @@ export function ProcedureModal({ isOpen, onClose, toothNumber, onProcedureSelect
 
   const tasks = [
     "Seleccionar diente completo",
-    "Seleccionar cuadrantes o dentición completa",
+    "Seleccionar cuadrantes o dentición completa", 
     "Seleccionar más dientes",
     "Seleccionar área del diente"
   ];
 
   const procedures = [
-    { id: 'diagnostico', name: 'Diagnóstico', icon: '🔍' },
+    { id: 'diagnostico', name: 'Diagnóstico', icon: '🦷' },
     { id: 'limpieza', name: 'Limpieza', icon: '🧽' },
-    { id: 'extraccion', name: 'Extracción', icon: '🔧' },
+    { id: 'obturacion', name: 'Obturación', icon: '🔧' },
+    { id: 'extraccion', name: 'Extracción', icon: '✂️' },
     { id: 'endodoncia', name: 'Endodoncia', icon: '⚕️' },
-    { id: 'restauracion', name: 'Restauración', icon: '🦷' },
-    { id: 'radiologia', name: 'Radiología', icon: '📱' },
-    { id: 'oclusion', name: 'Oclusión', icon: '🦷' },
-    { id: 'emergencia', name: 'Emergencia', icon: '🚨' },
-    { id: 'implante', name: 'Implante', icon: '🔩' },
-    { id: 'estetica', name: 'Estética', icon: '✨' },
-    { id: 'puente', name: 'Puente', icon: '🌉' },
-    { id: 'cortico', name: 'Cortico', icon: '🛡️' },
+    { id: 'corona', name: 'Corona', icon: '👑' },
     { id: 'aparatologia', name: 'Aparatología', icon: '🔧' },
-    { id: 'periodontologia', name: 'Periodontología', icon: '🦷' },
+    { id: 'periodontologia', name: 'Periodontología', icon: '🦠' },
     { id: 'cirugia', name: 'Cirugía', icon: '⚕️' },
-    { id: 'ortodoncia', name: 'Ortodoncia', icon: '🔧' },
-    { id: 'prevencion', name: 'Prevención', icon: '🛡️' },
-    { id: 'fluor', name: 'Flúor', icon: '💧' },
-    { id: 'prequirurgico', name: 'Prequirúrgico', icon: '⚕️' }
+    { id: 'implante', name: 'Implante', icon: '🔩' },
+    { id: 'radiografia', name: 'Radiografía', icon: '📱' },
+    { id: 'protesis', name: 'Prótesis', icon: '🦷' }
   ];
 
   const handleTaskToggle = (task: string) => {
@@ -62,10 +55,10 @@ export function ProcedureModal({ isOpen, onClose, toothNumber, onProcedureSelect
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center text-lg">
-            Seleccionar la tarea que desea realizar
+            Diente {toothNumber} - Seleccionar procedimiento
           </DialogTitle>
         </DialogHeader>
         
@@ -91,19 +84,21 @@ export function ProcedureModal({ isOpen, onClose, toothNumber, onProcedureSelect
             </Button>
           </div>
 
-          {/* Grid de procedimientos */}
-          <div className="grid grid-cols-5 gap-3">
-            {procedures.map((procedure) => (
-              <Button
-                key={procedure.id}
-                variant="outline"
-                className="flex flex-col items-center gap-2 h-20 hover:bg-gray-50"
-                onClick={() => handleProcedureClick(procedure.id)}
-              >
-                <span className="text-2xl">{procedure.icon}</span>
-                <span className="text-xs text-center">{procedure.name}</span>
-              </Button>
-            ))}
+          {/* Panel de procedimientos similar a la imagen */}
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
+            <div className="grid grid-cols-6 gap-4">
+              {procedures.map((procedure) => (
+                <Button
+                  key={procedure.id}
+                  variant="outline"
+                  className="flex flex-col items-center gap-2 h-20 bg-white hover:bg-blue-100 border-blue-200"
+                  onClick={() => handleProcedureClick(procedure.id)}
+                >
+                  <span className="text-2xl">{procedure.icon}</span>
+                  <span className="text-xs text-center font-medium">{procedure.name}</span>
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
       </DialogContent>

@@ -76,7 +76,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header con filtros y selector */}
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-6">
@@ -89,6 +89,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                 checked={filters.diagnostico}
                 onCheckedChange={(checked) => setFilters(prev => ({ ...prev, diagnostico: !!checked }))}
               />
+              <div className="w-4 h-4 bg-blue-500 rounded mr-1"></div>
               <label htmlFor="diagnostico" className="text-sm">Diagnóstico</label>
             </div>
             
@@ -98,6 +99,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                 checked={filters.realizados}
                 onCheckedChange={(checked) => setFilters(prev => ({ ...prev, realizados: !!checked }))}
               />
+              <div className="w-4 h-4 bg-green-500 rounded mr-1"></div>
               <label htmlFor="realizados" className="text-sm">Trabajos realizados</label>
             </div>
             
@@ -107,7 +109,8 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                 checked={filters.pendientes}
                 onCheckedChange={(checked) => setFilters(prev => ({ ...prev, pendientes: !!checked }))}
               />
-              <label htmlFor="pendientes" className="text-sm">Trabajos pendientes</label>
+              <div className="w-4 h-4 bg-red-500 rounded mr-1"></div>
+              <label htmlFor="pendientes" className="text-sm">Trabajo pendiente</label>
             </div>
           </div>
         </div>
@@ -123,31 +126,37 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
         </Select>
       </div>
 
-      {/* Dientes superiores */}
-      <div className="flex justify-center">
-        <div className="grid grid-cols-16 gap-2">
-          {teethNumbers.superior.map((toothNumber) => (
-            <ToothComponent
-              key={toothNumber}
-              number={toothNumber}
-              procedures={toothStates[toothNumber]?.procedures || []}
-              onClick={() => handleToothClick(toothNumber)}
-            />
-          ))}
+      {/* Contenedor del odontograma */}
+      <div className="bg-gray-50 p-8 rounded-lg border">
+        {/* Dientes superiores */}
+        <div className="flex justify-center mb-12">
+          <div className="flex gap-3">
+            {teethNumbers.superior.map((toothNumber) => (
+              <ToothComponent
+                key={toothNumber}
+                number={toothNumber}
+                procedures={toothStates[toothNumber]?.procedures || []}
+                onClick={() => handleToothClick(toothNumber)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Dientes inferiores */}
-      <div className="flex justify-center">
-        <div className="grid grid-cols-16 gap-2">
-          {teethNumbers.inferior.map((toothNumber) => (
-            <ToothComponent
-              key={toothNumber}
-              number={toothNumber}
-              procedures={toothStates[toothNumber]?.procedures || []}
-              onClick={() => handleToothClick(toothNumber)}
-            />
-          ))}
+        {/* Línea separadora */}
+        <div className="border-t border-gray-300 my-8"></div>
+
+        {/* Dientes inferiores */}
+        <div className="flex justify-center">
+          <div className="flex gap-3">
+            {teethNumbers.inferior.map((toothNumber) => (
+              <ToothComponent
+                key={toothNumber}
+                number={toothNumber}
+                procedures={toothStates[toothNumber]?.procedures || []}
+                onClick={() => handleToothClick(toothNumber)}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
