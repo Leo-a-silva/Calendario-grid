@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ToothComponent } from "./ToothComponent";
 import { Button } from "@/components/ui/button";
@@ -77,26 +78,26 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
   };
 
   const procedures = [
-    { id: 'diagnostico', name: 'Diagnóstico', icon: '🦷' },
-    { id: 'limpieza', name: 'Limpieza', icon: '🧽' },
-    { id: 'obturacion', name: 'Obturación', icon: '🦷' },
-    { id: 'extraccion', name: 'Extracción', icon: '🔧' },
-    { id: 'blanqueamiento', name: 'Blanqueamiento', icon: '✨' },
-    { id: 'radiografias', name: 'Radiografías', icon: '📱' },
-    { id: 'selladores', name: 'Selladores', icon: '🦷' },
-    { id: 'endodoncia', name: 'Endodoncia', icon: '⚕️' },
-    { id: 'implantes', name: 'Implantes', icon: '🔩' },
-    { id: 'coronas', name: 'Coronas', icon: '👑' },
-    { id: 'puentes', name: 'Puentes', icon: '🌉' },
-    { id: 'carillas', name: 'Carillas', icon: '🦷' },
-    { id: 'apicectomia', name: 'Apicectomía', icon: '⚕️' },
-    { id: 'prostodoncia', name: 'Prostodoncia', icon: '🦷' },
-    { id: 'cirugia', name: 'Cirugía maxilofacial', icon: '⚕️' },
-    { id: 'ortodoncia', name: 'Ortodoncia', icon: '🦷' },
-    { id: 'placa', name: 'Placa antibruxismo', icon: '🦷' },
-    { id: 'periodoncia', name: 'Periodoncia', icon: '🦠' },
-    { id: 'fluor', name: 'Flúor', icon: '💧' },
-    { id: 'frenectomia', name: 'Frenectomía', icon: '⚕️' }
+    { id: 'diagnostico', name: 'Diagnóstico' },
+    { id: 'limpieza', name: 'Limpieza' },
+    { id: 'obturacion', name: 'Obturación' },
+    { id: 'extraccion', name: 'Extracción' },
+    { id: 'blanqueamiento', name: 'Blanqueamiento' },
+    { id: 'radiografias', name: 'Radiografías' },
+    { id: 'selladores', name: 'Selladores' },
+    { id: 'endodoncia', name: 'Endodoncia' },
+    { id: 'implantes', name: 'Implantes' },
+    { id: 'coronas', name: 'Coronas' },
+    { id: 'puentes', name: 'Puentes' },
+    { id: 'carillas', name: 'Carillas' },
+    { id: 'apicectomia', name: 'Apicectomía' },
+    { id: 'prostodoncia', name: 'Prostodoncia' },
+    { id: 'cirugia', name: 'Cirugía maxilofacial' },
+    { id: 'ortodoncia', name: 'Ortodoncia' },
+    { id: 'placa', name: 'Placa antibruxismo' },
+    { id: 'periodoncia', name: 'Periodoncia' },
+    { id: 'fluor', name: 'Flúor' },
+    { id: 'frenectomia', name: 'Frenectomía' }
   ];
 
   return (
@@ -190,17 +191,17 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
       <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
         <div className="grid grid-cols-10 gap-4">
           {procedures.map((procedure) => (
-            <Button
-              key={procedure.id}
-              variant="outline"
-              className={`flex flex-col items-center gap-2 h-20 bg-white hover:bg-blue-100 border-blue-200 ${
-                selectedProcedure === procedure.id ? 'bg-blue-200 border-blue-400' : ''
-              }`}
-              onClick={() => handleProcedureSelect(procedure.id)}
-            >
-              <span className="text-2xl">{procedure.icon}</span>
-              <span className="text-xs text-center font-medium">{procedure.name}</span>
-            </Button>
+            <div key={procedure.id} className="flex flex-col items-center gap-2">
+              <button
+                className={`w-12 h-12 rounded-full border-2 transition-colors ${
+                  selectedProcedure === procedure.id 
+                    ? 'bg-blue-500 border-blue-600' 
+                    : 'bg-white border-gray-300 hover:border-blue-400'
+                }`}
+                onClick={() => handleProcedureSelect(procedure.id)}
+              />
+              <span className="text-xs text-center font-medium text-gray-700">{procedure.name}</span>
+            </div>
           ))}
         </div>
         
