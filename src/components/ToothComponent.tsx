@@ -1,4 +1,3 @@
-
 interface Procedure {
   type: 'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona' | 'ninguno';
   status: 'diagnostico' | 'realizado' | 'pendiente';
@@ -9,9 +8,10 @@ interface ToothComponentProps {
   number: number;
   procedures: Procedure[];
   onClick: () => void;
+  isSelected?: boolean;
 }
 
-export function ToothComponent({ number, procedures, onClick }: ToothComponentProps) {
+export function ToothComponent({ number, procedures, onClick, isSelected = false }: ToothComponentProps) {
   const getSegmentColor = (segment: string) => {
     const procedureForSegment = procedures.find(p => p.segments.includes(segment as any));
     if (!procedureForSegment) return 'white';
@@ -40,9 +40,9 @@ export function ToothComponent({ number, procedures, onClick }: ToothComponentPr
 
   const renderToothDrawing = () => {
     const commonProps = {
-      fill: "#e5e7eb",
-      stroke: "#9ca3af",
-      strokeWidth: "1"
+      fill: isSelected ? "#93c5fd" : "#e5e7eb",
+      stroke: isSelected ? "#2563eb" : "#9ca3af",
+      strokeWidth: isSelected ? "2" : "1"
     };
 
     if (toothType === 'incisor') {
@@ -102,8 +102,8 @@ export function ToothComponent({ number, procedures, onClick }: ToothComponentPr
           cy={centerY}
           r={radius}
           fill="white"
-          stroke="#9ca3af"
-          strokeWidth="1"
+          stroke={isSelected ? "#2563eb" : "#9ca3af"}
+          strokeWidth={isSelected ? "2" : "1"}
         />
         
         {/* Segmento Superior (Vestibular) */}
@@ -191,7 +191,11 @@ export function ToothComponent({ number, procedures, onClick }: ToothComponentPr
         
         {/* Número del diente */}
         <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-          <span className="text-xs font-semibold text-blue-600 bg-white px-1 rounded border">{number}</span>
+          <span className={`text-xs font-semibold px-1 rounded border ${
+            isSelected ? 'text-blue-800 bg-blue-100 border-blue-300' : 'text-blue-600 bg-white border-gray-300'
+          }`}>
+            {number}
+          </span>
         </div>
       </div>
     </div>

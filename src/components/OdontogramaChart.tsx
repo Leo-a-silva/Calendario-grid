@@ -1,7 +1,5 @@
-
 import { useState } from "react";
 import { ToothComponent } from "./ToothComponent";
-import { ProcedureModal } from "./ProcedureModal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,8 +19,8 @@ interface OdontogramaChartProps {
 
 export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
   const [selectedTooth, setSelectedTooth] = useState<number | null>(null);
-  const [showModal, setShowModal] = useState(false);
   const [toothStates, setToothStates] = useState<{ [key: number]: ToothState }>({});
+  const [selectedProcedure, setSelectedProcedure] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     diagnostico: true,
     realizados: true,
@@ -44,11 +42,14 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
 
   const handleToothClick = (toothNumber: number) => {
     setSelectedTooth(toothNumber);
-    setShowModal(true);
   };
 
   const handleProcedureSelect = (procedure: string) => {
-    if (!selectedTooth) return;
+    setSelectedProcedure(procedure);
+  };
+
+  const applyProcedureToTooth = () => {
+    if (!selectedTooth || !selectedProcedure) return;
 
     setToothStates(prev => {
       const currentTooth = prev[selectedTooth] || { number: selectedTooth, procedures: [] };
@@ -56,7 +57,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
       const updatedProcedures = [
         ...currentTooth.procedures,
         {
-          type: procedure as any,
+          type: selectedProcedure as any,
           status: 'diagnostico' as const,
           segments: ['oclusal' as const]
         }
@@ -71,9 +72,32 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
       };
     });
 
-    setShowModal(false);
     setSelectedTooth(null);
+    setSelectedProcedure(null);
   };
+
+  const procedures = [
+    { id: 'diagnostico', name: 'Diagnóstico', icon: '🦷' },
+    { id: 'limpieza', name: 'Limpieza', icon: '🧽' },
+    { id: 'obturacion', name: 'Obturación', icon: '🦷' },
+    { id: 'extraccion', name: 'Extracción', icon: '🔧' },
+    { id: 'blanqueamiento', name: 'Blanqueamiento', icon: '✨' },
+    { id: 'radiografias', name: 'Radiografías', icon: '📱' },
+    { id: 'selladores', name: 'Selladores', icon: '🦷' },
+    { id: 'endodoncia', name: 'Endodoncia', icon: '⚕️' },
+    { id: 'implantes', name: 'Implantes', icon: '🔩' },
+    { id: 'coronas', name: 'Coronas', icon: '👑' },
+    { id: 'puentes', name: 'Puentes', icon: '🌉' },
+    { id: 'carillas', name: 'Carillas', icon: '🦷' },
+    { id: 'apicectomia', name: 'Apicectomía', icon: '⚕️' },
+    { id: 'prostodoncia', name: 'Prostodoncia', icon: '🦷' },
+    { id: 'cirugia', name: 'Cirugía maxilofacial', icon: '⚕️' },
+    { id: 'ortodoncia', name: 'Ortodoncia', icon: '🦷' },
+    { id: 'placa', name: 'Placa antibruxismo', icon: '🦷' },
+    { id: 'periodoncia', name: 'Periodoncia', icon: '🦠' },
+    { id: 'fluor', name: 'Flúor', icon: '💧' },
+    { id: 'frenectomia', name: 'Frenectomía', icon: '⚕️' }
+  ];
 
   return (
     <div className="space-y-6">
@@ -137,6 +161,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                 number={toothNumber}
                 procedures={toothStates[toothNumber]?.procedures || []}
                 onClick={() => handleToothClick(toothNumber)}
+                isSelected={selectedTooth === toothNumber}
               />
             ))}
           </div>
@@ -154,19 +179,42 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                 number={toothNumber}
                 procedures={toothStates[toothNumber]?.procedures || []}
                 onClick={() => handleToothClick(toothNumber)}
+                isSelected={selectedTooth === toothNumber}
               />
             ))}
           </div>
         </div>
       </div>
 
-      {/* Modal de procedimientos */}
-      <ProcedureModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        toothNumber={selectedTooth}
-        onProcedureSelect={handleProcedureSelect}
-      />
+      {/* Panel de procedimientos */}
+      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
+        <div className="grid grid-cols-10 gap-4">
+          {procedures.map((procedure) => (
+            <Button
+              key={procedure.id}
+              variant="outline"
+              className={`flex flex-col items-center gap-2 h-20 bg-white hover:bg-blue-100 border-blue-200 ${
+                selectedProcedure === procedure.id ? 'bg-blue-200 border-blue-400' : ''
+              }`}
+              onClick={() => handleProcedureSelect(procedure.id)}
+            >
+              <span className="text-2xl">{procedure.icon}</span>
+              <span className="text-xs text-center font-medium">{procedure.name}</span>
+            </Button>
+          ))}
+        </div>
+        
+        {selectedTooth && selectedProcedure && (
+          <div className="mt-4 flex justify-center">
+            <Button 
+              onClick={applyProcedureToTooth}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              Aplicar {procedures.find(p => p.id === selectedProcedure)?.name} al diente {selectedTooth}
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
