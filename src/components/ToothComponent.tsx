@@ -2,104 +2,79 @@
 interface Procedure {
   type: 'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona' | 'ninguno';
   status: 'diagnostico' | 'realizado' | 'pendiente';
-  segments: ('superior' | 'inferior' | 'izquierdo' | 'derecho' | 'centro')[];
+  segments: ('oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal')[];
 }
 
 interface ToothComponentProps {
   number: number;
   procedures: Procedure[];
-  onSegmentClick: (segment: 'superior' | 'inferior' | 'izquierdo' | 'derecho' | 'centro') => void;
+  onClick: () => void;
 }
 
-export function ToothComponent({ number, procedures, onSegmentClick }: ToothComponentProps) {
-  const getSegmentColor = (segment: 'superior' | 'inferior' | 'izquierdo' | 'derecho' | 'centro') => {
-    const procedure = procedures.find(p => p.segments.includes(segment));
-    if (!procedure) return 'transparent';
+export function ToothComponent({ number, procedures, onClick }: ToothComponentProps) {
+  const getToothColor = () => {
+    if (procedures.length === 0) return 'white';
     
-    switch (procedure.status) {
+    const latestProcedure = procedures[procedures.length - 1];
+    switch (latestProcedure.status) {
       case 'diagnostico': return '#3B82F6'; // Azul
       case 'pendiente': return '#EF4444'; // Rojo
       case 'realizado': return '#10B981'; // Verde
-      default: return 'transparent';
+      default: return 'white';
+    }
+  };
+
+  // Determinar si es diente anterior, premolar o molar basado en el número
+  const getToothType = (num: number): 'anterior' | 'premolar' | 'molar' => {
+    const lastDigit = num % 10;
+    if (lastDigit >= 1 && lastDigit <= 3) return 'anterior';
+    if (lastDigit >= 4 && lastDigit <= 5) return 'premolar';
+    return 'molar';
+  };
+
+  const toothType = getToothType(number);
+  const toothColor = getToothColor();
+
+  // SVG path para diferentes tipos de dientes
+  const getToothPath = () => {
+    switch (toothType) {
+      case 'anterior':
+        return "M20 5 C25 5, 30 8, 30 15 L30 35 C30 42, 25 45, 20 45 C15 45, 10 42, 10 35 L10 15 C10 8, 15 5, 20 5 Z";
+      case 'premolar':
+        return "M20 8 C26 8, 32 10, 32 16 L32 34 C32 40, 26 42, 20 42 C14 42, 8 40, 8 34 L8 16 C8 10, 14 8, 20 8 Z";
+      case 'molar':
+        return "M20 10 C28 10, 35 12, 35 18 L35 32 C35 38, 28 40, 20 40 C12 40, 5 38, 5 32 L5 18 C5 12, 12 10, 20 10 Z";
+      default:
+        return "M20 8 C26 8, 32 10, 32 16 L32 34 C32 40, 26 42, 20 42 C14 42, 8 40, 8 34 L8 16 C8 10, 14 8, 20 8 Z";
     }
   };
 
   return (
-    <div className="flex flex-col items-center space-y-1">
-      <div className="relative w-12 h-12">
-        <svg width="48" height="48" viewBox="0 0 48 48" className="cursor-pointer">
-          {/* Círculo base */}
-          <circle
-            cx="24"
-            cy="24"
-            r="20"
-            fill="white"
-            stroke="#374151"
-            strokeWidth="2"
-          />
-          
-          {/* Segmento superior */}
+    <div className="flex flex-col items-center space-y-1 cursor-pointer" onClick={onClick}>
+      <div className="relative">
+        <svg width="40" height="50" viewBox="0 0 40 50" className="hover:opacity-80">
+          {/* Forma del diente */}
           <path
-            d="M 24 4 A 20 20 0 0 1 39.28 14 L 24 24 Z"
-            fill={getSegmentColor('superior')}
+            d={getToothPath()}
+            fill={toothColor}
             stroke="#374151"
-            strokeWidth="1"
-            onClick={() => onSegmentClick('superior')}
-            className="hover:opacity-80"
+            strokeWidth="1.5"
+            opacity={procedures.length > 0 ? "0.8" : "1"}
           />
           
-          {/* Segmento derecho */}
+          {/* Contorno del diente */}
           <path
-            d="M 39.28 14 A 20 20 0 0 1 39.28 34 L 24 24 Z"
-            fill={getSegmentColor('derecho')}
+            d={getToothPath()}
+            fill="none"
             stroke="#374151"
-            strokeWidth="1"
-            onClick={() => onSegmentClick('derecho')}
-            className="hover:opacity-80"
+            strokeWidth="1.5"
           />
-          
-          {/* Segmento inferior */}
-          <path
-            d="M 39.28 34 A 20 20 0 0 1 8.72 34 L 24 24 Z"
-            fill={getSegmentColor('inferior')}
-            stroke="#374151"
-            strokeWidth="1"
-            onClick={() => onSegmentClick('inferior')}
-            className="hover:opacity-80"
-          />
-          
-          {/* Segmento izquierdo */}
-          <path
-            d="M 8.72 34 A 20 20 0 0 1 8.72 14 L 24 24 Z"
-            fill={getSegmentColor('izquierdo')}
-            stroke="#374151"
-            strokeWidth="1"
-            onClick={() => onSegmentClick('izquierdo')}
-            className="hover:opacity-80"
-          />
-          
-          {/* Centro */}
-          <circle
-            cx="24"
-            cy="24"
-            r="6"
-            fill={getSegmentColor('centro')}
-            stroke="#374151"
-            strokeWidth="1"
-            onClick={() => onSegmentClick('centro')}
-            className="hover:opacity-80 cursor-pointer"
-          />
-          
-          {/* Número del diente */}
-          <text
-            x="24"
-            y="28"
-            textAnchor="middle"
-            className="text-xs font-bold fill-gray-700 pointer-events-none"
-          >
-            {number}
-          </text>
         </svg>
+        
+        {/* Número del diente */}
+        <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+          <span className="text-xs font-semibold text-gray-700">{number}</span>
+        </div>
       </div>
     </div>
   );

@@ -2,14 +2,16 @@
 import { useState } from "react";
 import { ToothComponent } from "./ToothComponent";
 import { ProcedureModal } from "./ProcedureModal";
-import { ProcedurePanel } from "./ProcedurePanel";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export interface ToothState {
   number: number;
   procedures: {
     type: 'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona' | 'ninguno';
     status: 'diagnostico' | 'realizado' | 'pendiente';
-    segments: ('superior' | 'inferior' | 'izquierdo' | 'derecho' | 'centro')[];
+    segments: ('oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal')[];
   }[];
 }
 
@@ -19,8 +21,13 @@ interface OdontogramaChartProps {
 
 export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
   const [selectedTooth, setSelectedTooth] = useState<number | null>(null);
-  const [selectedProcedure, setSelectedProcedure] = useState<'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona'>('diagnostico');
+  const [showModal, setShowModal] = useState(false);
   const [toothStates, setToothStates] = useState<{ [key: number]: ToothState }>({});
+  const [filters, setFilters] = useState({
+    diagnostico: true,
+    realizados: true,
+    pendientes: true
+  });
 
   // Números de dientes según el tipo de dentición
   const permanentTeeth = {
@@ -35,94 +42,121 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
 
   const teethNumbers = denticionType === 'permanente' ? permanentTeeth : primaryTeeth;
 
-  const handleToothClick = (toothNumber: number, segment: 'superior' | 'inferior' | 'izquierdo' | 'derecho' | 'centro') => {
-    if (!selectedProcedure) return;
+  const handleToothClick = (toothNumber: number) => {
+    setSelectedTooth(toothNumber);
+    setShowModal(true);
+  };
+
+  const handleProcedureSelect = (procedure: string) => {
+    if (!selectedTooth) return;
 
     setToothStates(prev => {
-      const currentTooth = prev[toothNumber] || { number: toothNumber, procedures: [] };
+      const currentTooth = prev[selectedTooth] || { number: selectedTooth, procedures: [] };
       
-      // Buscar si ya existe un procedimiento del mismo tipo en el mismo segmento
-      const existingProcedureIndex = currentTooth.procedures.findIndex(
-        p => p.type === selectedProcedure && p.segments.includes(segment)
-      );
-
-      let updatedProcedures;
-      if (existingProcedureIndex >= 0) {
-        // Si existe, cambiar el estado (diagnostico -> pendiente -> realizado -> ninguno)
-        const currentProcedure = currentTooth.procedures[existingProcedureIndex];
-        const statusCycle: ('diagnostico' | 'pendiente' | 'realizado')[] = ['diagnostico', 'pendiente', 'realizado'];
-        const currentIndex = statusCycle.indexOf(currentProcedure.status);
-        const nextIndex = (currentIndex + 1) % statusCycle.length;
-        
-        if (nextIndex === 0) {
-          // Volver al inicio del ciclo o eliminar si es el tercer click
-          updatedProcedures = currentTooth.procedures.filter((_, index) => index !== existingProcedureIndex);
-        } else {
-          updatedProcedures = [...currentTooth.procedures];
-          updatedProcedures[existingProcedureIndex] = {
-            ...currentProcedure,
-            status: statusCycle[nextIndex]
-          };
+      const updatedProcedures = [
+        ...currentTooth.procedures,
+        {
+          type: procedure as any,
+          status: 'diagnostico' as const,
+          segments: ['oclusal' as const]
         }
-      } else {
-        // Si no existe, crear uno nuevo
-        updatedProcedures = [
-          ...currentTooth.procedures,
-          {
-            type: selectedProcedure,
-            status: 'diagnostico' as const,
-            segments: [segment]
-          }
-        ];
-      }
+      ];
 
       return {
         ...prev,
-        [toothNumber]: {
+        [selectedTooth]: {
           ...currentTooth,
           procedures: updatedProcedures
         }
       };
     });
+
+    setShowModal(false);
+    setSelectedTooth(null);
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      {/* Header con filtros y selector */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-6">
+          <h2 className="text-xl font-bold">Odontograma</h2>
+          
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="diagnostico" 
+                checked={filters.diagnostico}
+                onCheckedChange={(checked) => setFilters(prev => ({ ...prev, diagnostico: !!checked }))}
+              />
+              <label htmlFor="diagnostico" className="text-sm">Diagnóstico</label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="realizados" 
+                checked={filters.realizados}
+                onCheckedChange={(checked) => setFilters(prev => ({ ...prev, realizados: !!checked }))}
+              />
+              <label htmlFor="realizados" className="text-sm">Trabajos realizados</label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="pendientes" 
+                checked={filters.pendientes}
+                onCheckedChange={(checked) => setFilters(prev => ({ ...prev, pendientes: !!checked }))}
+              />
+              <label htmlFor="pendientes" className="text-sm">Trabajos pendientes</label>
+            </div>
+          </div>
+        </div>
+
+        <Select defaultValue={denticionType}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Seleccionar dentición" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="permanente">Dentición permanente</SelectItem>
+            <SelectItem value="primaria">Dentición primaria</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Dientes superiores */}
       <div className="flex justify-center">
-        <div className="grid grid-cols-8 gap-3 lg:grid-cols-16">
+        <div className="grid grid-cols-16 gap-2">
           {teethNumbers.superior.map((toothNumber) => (
             <ToothComponent
               key={toothNumber}
               number={toothNumber}
               procedures={toothStates[toothNumber]?.procedures || []}
-              onSegmentClick={(segment) => handleToothClick(toothNumber, segment)}
+              onClick={() => handleToothClick(toothNumber)}
             />
           ))}
         </div>
       </div>
 
-      {/* Línea divisoria */}
-      <div className="border-t-2 border-gray-300 mx-8"></div>
-
       {/* Dientes inferiores */}
       <div className="flex justify-center">
-        <div className="grid grid-cols-8 gap-3 lg:grid-cols-16">
+        <div className="grid grid-cols-16 gap-2">
           {teethNumbers.inferior.map((toothNumber) => (
             <ToothComponent
               key={toothNumber}
               number={toothNumber}
               procedures={toothStates[toothNumber]?.procedures || []}
-              onSegmentClick={(segment) => handleToothClick(toothNumber, segment)}
+              onClick={() => handleToothClick(toothNumber)}
             />
           ))}
         </div>
       </div>
 
-      {/* Panel de procedimientos */}
-      <ProcedurePanel
-        selectedProcedure={selectedProcedure}
-        onProcedureSelect={setSelectedProcedure}
+      {/* Modal de procedimientos */}
+      <ProcedureModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        toothNumber={selectedTooth}
+        onProcedureSelect={handleProcedureSelect}
       />
     </div>
   );
