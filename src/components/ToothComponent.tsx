@@ -1,3 +1,4 @@
+
 interface Procedure {
   type: 'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona' | 'ninguno';
   status: 'diagnostico' | 'realizado' | 'pendiente';
@@ -108,7 +109,7 @@ export function ToothComponent({ number, procedures, onClick, isSelected = false
         
         {/* Segmento Superior (Vestibular) */}
         <path
-          d={`M ${centerX} ${centerY} L ${centerX} ${centerY - radius} A ${radius} ${radius} 0 0 1 ${centerX + radius * 0.707} ${centerY - radius * 0.707} Z`}
+          d={`M ${centerX} ${centerY} L ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX} ${centerY - radius} Z`}
           fill={getSegmentColor('vestibular')}
           stroke="#9ca3af"
           strokeWidth="0.5"
@@ -121,7 +122,7 @@ export function ToothComponent({ number, procedures, onClick, isSelected = false
         
         {/* Segmento Derecho (Distal) */}
         <path
-          d={`M ${centerX} ${centerY} L ${centerX + radius * 0.707} ${centerY - radius * 0.707} A ${radius} ${radius} 0 0 1 ${centerX + radius * 0.707} ${centerY + radius * 0.707} Z`}
+          d={`M ${centerX} ${centerY} L ${centerX} ${centerY - radius} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY} Z`}
           fill={getSegmentColor('distal')}
           stroke="#9ca3af"
           strokeWidth="0.5"
@@ -134,7 +135,7 @@ export function ToothComponent({ number, procedures, onClick, isSelected = false
         
         {/* Segmento Inferior (Lingual) */}
         <path
-          d={`M ${centerX} ${centerY} L ${centerX + radius * 0.707} ${centerY + radius * 0.707} A ${radius} ${radius} 0 0 1 ${centerX - radius * 0.707} ${centerY + radius * 0.707} Z`}
+          d={`M ${centerX} ${centerY} L ${centerX + radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX} ${centerY + radius} Z`}
           fill={getSegmentColor('lingual')}
           stroke="#9ca3af"
           strokeWidth="0.5"
@@ -147,7 +148,7 @@ export function ToothComponent({ number, procedures, onClick, isSelected = false
         
         {/* Segmento Izquierdo (Mesial) */}
         <path
-          d={`M ${centerX} ${centerY} L ${centerX - radius * 0.707} ${centerY + radius * 0.707} A ${radius} ${radius} 0 0 1 ${centerX - radius * 0.707} ${centerY - radius * 0.707} Z`}
+          d={`M ${centerX} ${centerY} L ${centerX} ${centerY + radius} A ${radius} ${radius} 0 0 1 ${centerX - radius} ${centerY} Z`}
           fill={getSegmentColor('mesial')}
           stroke="#9ca3af"
           strokeWidth="0.5"
