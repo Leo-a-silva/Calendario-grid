@@ -1,4 +1,3 @@
-
 interface Procedure {
   type: 'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona' | 'ninguno';
   status: 'diagnostico' | 'realizado' | 'pendiente';
@@ -9,10 +8,11 @@ interface ToothComponentProps {
   number: number;
   procedures: Procedure[];
   onClick: () => void;
+  onSegmentClick: (toothNumber: number, segment: string) => void;
   isSelected?: boolean;
 }
 
-export function ToothComponent({ number, procedures, onClick, isSelected = false }: ToothComponentProps) {
+export function ToothComponent({ number, procedures, onClick, onSegmentClick, isSelected = false }: ToothComponentProps) {
   const getSegmentColor = (segment: string) => {
     const procedureForSegment = procedures.find(p => p.segments.includes(segment as any));
     if (!procedureForSegment) return 'white';
@@ -95,6 +95,11 @@ export function ToothComponent({ number, procedures, onClick, isSelected = false
     const centerY = 25;
     const radius = 15;
 
+    const handleSegmentClick = (segment: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      onSegmentClick(number, segment);
+    };
+
     return (
       <g>
         {/* Círculo base */}
@@ -114,10 +119,7 @@ export function ToothComponent({ number, procedures, onClick, isSelected = false
           stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
+          onClick={(e) => handleSegmentClick('vestibular', e)}
         />
         
         {/* Segmento Derecho (Distal) */}
@@ -127,10 +129,7 @@ export function ToothComponent({ number, procedures, onClick, isSelected = false
           stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
+          onClick={(e) => handleSegmentClick('distal', e)}
         />
         
         {/* Segmento Inferior (Lingual) */}
@@ -140,10 +139,7 @@ export function ToothComponent({ number, procedures, onClick, isSelected = false
           stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
+          onClick={(e) => handleSegmentClick('lingual', e)}
         />
         
         {/* Segmento Izquierdo (Mesial) */}
@@ -153,10 +149,7 @@ export function ToothComponent({ number, procedures, onClick, isSelected = false
           stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
+          onClick={(e) => handleSegmentClick('mesial', e)}
         />
         
         {/* Segmento Central (Oclusal) */}
@@ -168,10 +161,7 @@ export function ToothComponent({ number, procedures, onClick, isSelected = false
           stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
+          onClick={(e) => handleSegmentClick('oclusal', e)}
         />
       </g>
     );

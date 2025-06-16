@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ToothComponent } from "./ToothComponent";
+import { SegmentSelectionModal } from "./SegmentSelectionModal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,6 +20,8 @@ interface OdontogramaChartProps {
 
 export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
   const [selectedTooth, setSelectedTooth] = useState<number | null>(null);
+  const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
+  const [isSegmentModalOpen, setIsSegmentModalOpen] = useState(false);
   const [toothStates, setToothStates] = useState<{ [key: number]: ToothState }>({});
   const [selectedProcedure, setSelectedProcedure] = useState<string | null>(null);
   const [filters, setFilters] = useState({
@@ -54,6 +57,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
               number={toothNumber}
               procedures={toothStates[toothNumber]?.procedures || []}
               onClick={() => handleToothClick(toothNumber)}
+              onSegmentClick={handleSegmentClick}
               isSelected={selectedTooth === toothNumber}
             />
           ))}
@@ -71,6 +75,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
               number={toothNumber}
               procedures={toothStates[toothNumber]?.procedures || []}
               onClick={() => handleToothClick(toothNumber)}
+              onSegmentClick={handleSegmentClick}
               isSelected={selectedTooth === toothNumber}
             />
           ))}
@@ -81,6 +86,18 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
 
   const handleToothClick = (toothNumber: number) => {
     setSelectedTooth(toothNumber);
+  };
+
+  const handleSegmentClick = (toothNumber: number, segment: string) => {
+    console.log(`Clicked segment ${segment} of tooth ${toothNumber}`);
+    setSelectedTooth(toothNumber);
+    setSelectedSegment(segment);
+    setIsSegmentModalOpen(true);
+  };
+
+  const handleTaskSelect = (tasks: string[]) => {
+    console.log("Selected tasks:", tasks);
+    // Aquí puedes implementar la lógica específica para cada tarea seleccionada
   };
 
   const handleProcedureSelect = (procedure: string) => {
@@ -193,7 +210,38 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
       <div className="bg-white p-6 rounded-lg border shadow-sm">
         {/* Dientes superiores */}
         <div className="flex justify-center mb-8">
-          {renderTeethWithSeparation(teethNumbers.superior)}
+          <div className="flex items-center gap-2">
+            <div className="flex gap-2">
+              {teethNumbers.superior.slice(0, teethNumbers.superior.length / 2).map((toothNumber) => (
+                <ToothComponent
+                  key={toothNumber}
+                  number={toothNumber}
+                  procedures={toothStates[toothNumber]?.procedures || []}
+                  onClick={() => handleToothClick(toothNumber)}
+                  onSegmentClick={handleSegmentClick}
+                  isSelected={selectedTooth === toothNumber}
+                />
+              ))}
+            </div>
+            
+            {/* Separación central */}
+            <div className="w-6 flex justify-center">
+              <div className="w-0.5 h-16 bg-gray-400"></div>
+            </div>
+            
+            <div className="flex gap-2">
+              {teethNumbers.superior.slice(teethNumbers.superior.length / 2).map((toothNumber) => (
+                <ToothComponent
+                  key={toothNumber}
+                  number={toothNumber}
+                  procedures={toothStates[toothNumber]?.procedures || []}
+                  onClick={() => handleToothClick(toothNumber)}
+                  onSegmentClick={handleSegmentClick}
+                  isSelected={selectedTooth === toothNumber}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Línea separadora */}
@@ -201,7 +249,38 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
 
         {/* Dientes inferiores */}
         <div className="flex justify-center">
-          {renderTeethWithSeparation(teethNumbers.inferior)}
+          <div className="flex items-center gap-2">
+            <div className="flex gap-2">
+              {teethNumbers.inferior.slice(0, teethNumbers.inferior.length / 2).map((toothNumber) => (
+                <ToothComponent
+                  key={toothNumber}
+                  number={toothNumber}
+                  procedures={toothStates[toothNumber]?.procedures || []}
+                  onClick={() => handleToothClick(toothNumber)}
+                  onSegmentClick={handleSegmentClick}
+                  isSelected={selectedTooth === toothNumber}
+                />
+              ))}
+            </div>
+            
+            {/* Separación central */}
+            <div className="w-6 flex justify-center">
+              <div className="w-0.5 h-16 bg-gray-400"></div>
+            </div>
+            
+            <div className="flex gap-2">
+              {teethNumbers.inferior.slice(teethNumbers.inferior.length / 2).map((toothNumber) => (
+                <ToothComponent
+                  key={toothNumber}
+                  number={toothNumber}
+                  procedures={toothStates[toothNumber]?.procedures || []}
+                  onClick={() => handleToothClick(toothNumber)}
+                  onSegmentClick={handleSegmentClick}
+                  isSelected={selectedTooth === toothNumber}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -234,6 +313,15 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
           </div>
         )}
       </div>
+
+      {/* Modal de selección de segmentos */}
+      <SegmentSelectionModal
+        isOpen={isSegmentModalOpen}
+        onClose={() => setIsSegmentModalOpen(false)}
+        toothNumber={selectedTooth}
+        segment={selectedSegment}
+        onTaskSelect={handleTaskSelect}
+      />
     </div>
   );
 }
