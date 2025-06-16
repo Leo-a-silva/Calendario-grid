@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ToothComponent } from "./ToothComponent";
 import { Button } from "@/components/ui/button";
@@ -40,6 +39,45 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
   };
 
   const teethNumbers = denticionType === 'permanente' ? permanentTeeth : primaryTeeth;
+
+  // Helper function to render teeth with separation
+  const renderTeethWithSeparation = (teeth: number[]) => {
+    const leftSide = teeth.slice(0, teeth.length / 2);
+    const rightSide = teeth.slice(teeth.length / 2);
+
+    return (
+      <div className="flex items-center gap-2">
+        <div className="flex gap-2">
+          {leftSide.map((toothNumber) => (
+            <ToothComponent
+              key={toothNumber}
+              number={toothNumber}
+              procedures={toothStates[toothNumber]?.procedures || []}
+              onClick={() => handleToothClick(toothNumber)}
+              isSelected={selectedTooth === toothNumber}
+            />
+          ))}
+        </div>
+        
+        {/* Separación central */}
+        <div className="w-6 flex justify-center">
+          <div className="w-0.5 h-16 bg-gray-400"></div>
+        </div>
+        
+        <div className="flex gap-2">
+          {rightSide.map((toothNumber) => (
+            <ToothComponent
+              key={toothNumber}
+              number={toothNumber}
+              procedures={toothStates[toothNumber]?.procedures || []}
+              onClick={() => handleToothClick(toothNumber)}
+              isSelected={selectedTooth === toothNumber}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const handleToothClick = (toothNumber: number) => {
     setSelectedTooth(toothNumber);
@@ -155,17 +193,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
       <div className="bg-white p-6 rounded-lg border shadow-sm">
         {/* Dientes superiores */}
         <div className="flex justify-center mb-8">
-          <div className="flex gap-2">
-            {teethNumbers.superior.map((toothNumber) => (
-              <ToothComponent
-                key={toothNumber}
-                number={toothNumber}
-                procedures={toothStates[toothNumber]?.procedures || []}
-                onClick={() => handleToothClick(toothNumber)}
-                isSelected={selectedTooth === toothNumber}
-              />
-            ))}
-          </div>
+          {renderTeethWithSeparation(teethNumbers.superior)}
         </div>
 
         {/* Línea separadora */}
@@ -173,17 +201,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
 
         {/* Dientes inferiores */}
         <div className="flex justify-center">
-          <div className="flex gap-2">
-            {teethNumbers.inferior.map((toothNumber) => (
-              <ToothComponent
-                key={toothNumber}
-                number={toothNumber}
-                procedures={toothStates[toothNumber]?.procedures || []}
-                onClick={() => handleToothClick(toothNumber)}
-                isSelected={selectedTooth === toothNumber}
-              />
-            ))}
-          </div>
+          {renderTeethWithSeparation(teethNumbers.inferior)}
         </div>
       </div>
 
