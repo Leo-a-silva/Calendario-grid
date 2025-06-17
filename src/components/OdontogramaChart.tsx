@@ -4,6 +4,8 @@ import { SegmentSelectionModal } from "./SegmentSelectionModal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToothSelection } from "@/hooks/useToothSelection";
+import { useToast } from "@/hooks/use-toast";
 
 export interface ToothState {
   number: number;
@@ -29,6 +31,15 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
     realizados: true,
     pendientes: true
   });
+
+  const { 
+    selectionState, 
+    isToothSelected, 
+    isSegmentSelected, 
+    clearSelection 
+  } = useToothSelection();
+  
+  const { toast } = useToast();
 
   // Números de dientes según el tipo de dentición
   const permanentTeeth = {
@@ -58,7 +69,8 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
               procedures={toothStates[toothNumber]?.procedures || []}
               onClick={() => handleToothClick(toothNumber)}
               onSegmentClick={handleSegmentClick}
-              isSelected={selectedTooth === toothNumber}
+              isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
+              isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
             />
           ))}
         </div>
@@ -76,7 +88,8 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
               procedures={toothStates[toothNumber]?.procedures || []}
               onClick={() => handleToothClick(toothNumber)}
               onSegmentClick={handleSegmentClick}
-              isSelected={selectedTooth === toothNumber}
+              isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
+              isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
             />
           ))}
         </div>
@@ -95,40 +108,60 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
     setIsSegmentModalOpen(true);
   };
 
-  const handleTaskSelect = (tasks: string[]) => {
-    console.log("Selected tasks:", tasks);
-    // Aquí puedes implementar la lógica específica para cada tarea seleccionada
+  const handleApplySelection = () => {
+    if (selectionState.selectedTeeth.length > 0) {
+      toast({
+        title: "Selección aplicada",
+        description: `${selectionState.selectedTeeth.length} diente(s) seleccionado(s) correctamente.`,
+      });
+    }
   };
 
   const handleProcedureSelect = (procedure: string) => {
     setSelectedProcedure(procedure);
   };
 
-  const applyProcedureToTooth = () => {
-    if (!selectedTooth || !selectedProcedure) return;
+  const applyProcedureToSelection = () => {
+    if (!selectedProcedure || selectionState.selectedTeeth.length === 0) {
+      toast({
+        title: "Error",
+        description: "Selecciona un procedimiento y al menos un diente.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setToothStates(prev => {
-      const currentTooth = prev[selectedTooth] || { number: selectedTooth, procedures: [] };
+      const updated = { ...prev };
       
-      const updatedProcedures = [
-        ...currentTooth.procedures,
-        {
+      selectionState.selectedTeeth.forEach(({ toothNumber, segments, isComplete }) => {
+        const currentTooth = updated[toothNumber] || { number: toothNumber, procedures: [] };
+        
+        const procedureSegments = isComplete 
+          ? ['oclusal', 'vestibular', 'lingual', 'mesial', 'distal'] as const
+          : segments as ('oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal')[];
+
+        const newProcedure = {
           type: selectedProcedure as any,
           status: 'diagnostico' as const,
-          segments: ['oclusal' as const]
-        }
-      ];
+          segments: procedureSegments
+        };
 
-      return {
-        ...prev,
-        [selectedTooth]: {
+        updated[toothNumber] = {
           ...currentTooth,
-          procedures: updatedProcedures
-        }
-      };
+          procedures: [...currentTooth.procedures, newProcedure]
+        };
+      });
+
+      return updated;
     });
 
-    setSelectedTooth(null);
+    toast({
+      title: "Procedimiento aplicado",
+      description: `${procedures.find(p => p.id === selectedProcedure)?.name} aplicado a ${selectionState.selectedTeeth.length} diente(s).`,
+    });
+
+    clearSelection();
     setSelectedProcedure(null);
   };
 
@@ -159,9 +192,29 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Odontograma</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl font-bold">Odontograma</h2>
+          
+          {/* Indicador de selección */}
+          {selectionState.selectedTeeth.length > 0 && (
+            <div className="bg-blue-100 px-3 py-1 rounded-full flex items-center gap-2">
+              <span className="text-sm font-medium text-blue-800">
+                {selectionState.selectedTeeth.length} seleccionados
+              </span>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={clearSelection}
+                className="h-6 w-6 p-0 hover:bg-blue-200"
+              >
+                ×
+              </Button>
+            </div>
+          )}
+        </div>
         
         <div className="flex items-center space-x-6">
+          {/* ... keep existing code (filters and select) */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Checkbox 
@@ -219,7 +272,8 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                   procedures={toothStates[toothNumber]?.procedures || []}
                   onClick={() => handleToothClick(toothNumber)}
                   onSegmentClick={handleSegmentClick}
-                  isSelected={selectedTooth === toothNumber}
+                  isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
+                  isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
                 />
               ))}
             </div>
@@ -237,7 +291,8 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                   procedures={toothStates[toothNumber]?.procedures || []}
                   onClick={() => handleToothClick(toothNumber)}
                   onSegmentClick={handleSegmentClick}
-                  isSelected={selectedTooth === toothNumber}
+                  isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
+                  isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
                 />
               ))}
             </div>
@@ -258,7 +313,8 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                   procedures={toothStates[toothNumber]?.procedures || []}
                   onClick={() => handleToothClick(toothNumber)}
                   onSegmentClick={handleSegmentClick}
-                  isSelected={selectedTooth === toothNumber}
+                  isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
+                  isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
                 />
               ))}
             </div>
@@ -276,7 +332,8 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                   procedures={toothStates[toothNumber]?.procedures || []}
                   onClick={() => handleToothClick(toothNumber)}
                   onSegmentClick={handleSegmentClick}
-                  isSelected={selectedTooth === toothNumber}
+                  isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
+                  isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
                 />
               ))}
             </div>
@@ -302,13 +359,13 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
           ))}
         </div>
         
-        {selectedTooth && selectedProcedure && (
+        {selectionState.selectedTeeth.length > 0 && selectedProcedure && (
           <div className="mt-4 flex justify-center">
             <Button 
-              onClick={applyProcedureToTooth}
+              onClick={applyProcedureToSelection}
               className="bg-blue-500 hover:bg-blue-600 text-white"
             >
-              Aplicar {procedures.find(p => p.id === selectedProcedure)?.name} al diente {selectedTooth}
+              Aplicar {procedures.find(p => p.id === selectedProcedure)?.name} a {selectionState.selectedTeeth.length} diente(s)
             </Button>
           </div>
         )}
@@ -320,7 +377,8 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
         onClose={() => setIsSegmentModalOpen(false)}
         toothNumber={selectedTooth}
         segment={selectedSegment}
-        onTaskSelect={handleTaskSelect}
+        denticionType={denticionType}
+        onApplySelection={handleApplySelection}
       />
     </div>
   );
