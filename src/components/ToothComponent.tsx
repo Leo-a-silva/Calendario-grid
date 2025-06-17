@@ -1,3 +1,4 @@
+
 interface Procedure {
   type: 'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona' | 'ninguno';
   status: 'diagnostico' | 'realizado' | 'pendiente';
@@ -9,10 +10,18 @@ interface ToothComponentProps {
   procedures: Procedure[];
   onClick: () => void;
   onSegmentClick: (toothNumber: number, segment: string) => void;
+  onNumberClick: (toothNumber: number) => void;
   isSelected?: boolean;
 }
 
-export function ToothComponent({ number, procedures, onClick, onSegmentClick, isSelected = false }: ToothComponentProps) {
+export function ToothComponent({ 
+  number, 
+  procedures, 
+  onClick, 
+  onSegmentClick, 
+  onNumberClick,
+  isSelected = false 
+}: ToothComponentProps) {
   const getSegmentColor = (segment: string) => {
     const procedureForSegment = procedures.find(p => p.segments.includes(segment as any));
     if (!procedureForSegment) return 'white';
@@ -167,6 +176,11 @@ export function ToothComponent({ number, procedures, onClick, onSegmentClick, is
     );
   };
 
+  const handleNumberClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onNumberClick(number);
+  };
+
   return (
     <div className="flex flex-col items-center space-y-2">
       {/* Dibujo del diente arriba */}
@@ -174,20 +188,25 @@ export function ToothComponent({ number, procedures, onClick, onSegmentClick, is
         {renderToothDrawing()}
       </svg>
       
-      {/* Círculo con segmentos abajo */}
+      {/* Círculo con segmentos */}
       <div className="relative">
         <svg width="45" height="50" viewBox="0 0 45 50" className="hover:opacity-90">
           {renderCircleSegments()}
         </svg>
-        
-        {/* Número del diente */}
-        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-          <span className={`text-xs font-semibold px-1 rounded border ${
-            isSelected ? 'text-blue-800 bg-blue-100 border-blue-300' : 'text-blue-600 bg-white border-gray-300'
-          }`}>
-            {number}
-          </span>
-        </div>
+      </div>
+
+      {/* Número del diente más abajo y redondo */}
+      <div className="mt-2">
+        <button
+          onClick={handleNumberClick}
+          className={`w-8 h-8 rounded-full text-xs font-semibold border-2 transition-colors hover:opacity-80 ${
+            isSelected 
+              ? 'text-blue-800 bg-blue-100 border-blue-500' 
+              : 'text-blue-600 bg-white border-blue-300 hover:border-blue-400'
+          }`}
+        >
+          {number}
+        </button>
       </div>
     </div>
   );
