@@ -31,6 +31,8 @@ export function SegmentSelectionModal({
   const [showQuadrants, setShowQuadrants] = useState(false);
   const [showSegmentSelection, setShowSegmentSelection] = useState(false);
   const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
+  const [showSegmentStatusSelection, setShowSegmentStatusSelection] = useState(false);
+  const [selectedSegmentForStatus, setSelectedSegmentForStatus] = useState<string>('');
   
   const { 
     selectionState, 
@@ -54,6 +56,12 @@ export function SegmentSelectionModal({
     { id: 'lingual', name: 'Lingual (interior)' },
     { id: 'mesial', name: 'Mesial (izquierda)' },
     { id: 'distal', name: 'Distal (derecha)' }
+  ];
+
+  const workStatuses = [
+    { id: 'diagnostico', name: 'Diagnóstico', color: '#3B82F6' },
+    { id: 'pendiente', name: 'Trabajo pendiente', color: '#EF4444' },
+    { id: 'realizado', name: 'Trabajo realizado', color: '#10B981' }
   ];
 
   const handleTaskToggle = (task: string) => {
@@ -82,14 +90,13 @@ export function SegmentSelectionModal({
           setSelectionMode('single');
           break;
           
-        case "Selecc`ionar más dientes":
+        case "Seleccionar más dientes":
           if (segment) {
             addToothSelection(toothNumber, [segment]);
           } else {
             addToothSelection(toothNumber, [], true);
           }
           setSelectionMode('multiple');
-          // Mostrar popup de selección múltiple
           showMultipleSelectionPopup();
           return;
           
@@ -129,7 +136,6 @@ export function SegmentSelectionModal({
     
     document.body.appendChild(popup);
     
-    // Manejar botones del popup
     const finalizeBtn = popup.querySelector('#finalize-btn');
     const cancelBtn = popup.querySelector('#cancel-btn');
     
@@ -143,7 +149,6 @@ export function SegmentSelectionModal({
       clearSelection();
     });
     
-    // Auto-remover después de 10 segundos
     setTimeout(() => {
       if (document.body.contains(popup)) {
         document.body.removeChild(popup);
@@ -173,16 +178,59 @@ export function SegmentSelectionModal({
     resetModal();
   };
 
+  const handleSegmentForStatusSelection = (segmentId: string) => {
+    setSelectedSegmentForStatus(segmentId);
+    setShowSegmentStatusSelection(true);
+  };
+
+  const handleStatusSelection = (status: string) => {
+    if (!toothNumber || !selectedSegmentForStatus) return;
+    
+    // Aquí aplicamos el estado al segmento - esto se puede conectar con el sistema de procedimientos
+    addToothSelection(toothNumber, [selectedSegmentForStatus]);
+    
+    // Crear un popup temporal para mostrar la selección
+    const statusInfo = workStatuses.find(s => s.id === status);
+    const popup = document.createElement('div');
+    popup.className = 'fixed top-4 right-4 bg-white border border-green-300 rounded-lg p-4 shadow-lg z-50';
+    popup.innerHTML = `
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-4 h-4 rounded" style="background-color: ${statusInfo?.color}"></div>
+        <span class="text-sm font-medium">Área marcada como: ${statusInfo?.name}</span>
+      </div>
+      <div class="text-xs text-gray-600">Diente ${toothNumber} - ${selectedSegmentForStatus}</div>
+    `;
+    
+    document.body.appendChild(popup);
+    setTimeout(() => {
+      if (document.body.contains(popup)) {
+        document.body.removeChild(popup);
+      }
+    }, 3000);
+
+    setSelectionMode('single');
+    onApplySelection();
+    onClose();
+    resetModal();
+  };
+
   const resetModal = () => {
     setSelectedTasks([]);
     setShowQuadrants(false);
     setShowSegmentSelection(false);
     setSelectedSegments([]);
+    setShowSegmentStatusSelection(false);
+    setSelectedSegmentForStatus('');
   };
 
   const handleCancel = () => {
     onClose();
     resetModal();
+  };
+
+  const handleBackToSegmentSelection = () => {
+    setShowSegmentStatusSelection(false);
+    setSelectedSegmentForStatus('');
   };
 
   return (
@@ -192,12 +240,13 @@ export function SegmentSelectionModal({
           <DialogTitle className="text-center text-base text-gray-700">
             {showQuadrants ? 'Seleccionar cuadrante' : 
              showSegmentSelection ? 'Seleccionar área del diente' :
+             showSegmentStatusSelection ? 'Estado del trabajo' :
              `Diente ${toothNumber}${segment ? ` - ${segment}` : ''}`}
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
-          {!showQuadrants && !showSegmentSelection ? (
+          {!showQuadrants && !showSegmentSelection && !showSegmentStatusSelection ? (
             <>
               {/* Lista de tareas con checkboxes */}
               <div className="space-y-3">
@@ -298,39 +347,63 @@ export function SegmentSelectionModal({
                 </Button>
               </div>
             </>
-          ) : (
+          ) : showSegmentSelection && !showSegmentStatusSelection ? (
             <>
-              {/* Selección de segmentos */}
+              {/* Selección de segmentos para trabajar */}
               <div className="space-y-3">
                 <p className="text-sm text-gray-600 mb-3">
                   Selecciona las áreas del diente que deseas trabajar:
                 </p>
                 {segments.map((segment) => (
-                  <div key={segment.id} className="flex items-center space-x-3">
-                    <Checkbox 
-                      id={segment.id}
-                      checked={selectedSegments.includes(segment.id)}
-                      onCheckedChange={() => handleSegmentToggle(segment.id)}
-                      className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
-                    />
-                    <label htmlFor={segment.id} className="text-sm text-gray-700">{segment.name}</label>
-                  </div>
+                  <Button
+                    key={segment.id}
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => handleSegmentForStatusSelection(segment.id)}
+                  >
+                    {segment.name}
+                  </Button>
                 ))}
               </div>
 
-              <div className="flex justify-center gap-2 pt-4">
+              <div className="flex justify-center pt-4">
                 <Button 
                   variant="outline"
                   onClick={() => setShowSegmentSelection(false)}
                 >
                   Volver
                 </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Selección de estado del trabajo */}
+              <div className="space-y-3">
+                <p className="text-sm text-gray-600 mb-3">
+                  ¿Cuál es el estado del trabajo en {segments.find(s => s.id === selectedSegmentForStatus)?.name}?
+                </p>
+                {workStatuses.map((status) => (
+                  <Button
+                    key={status.id}
+                    variant="outline"
+                    className="w-full justify-start flex items-center gap-3"
+                    onClick={() => handleStatusSelection(status.id)}
+                  >
+                    <div 
+                      className="w-4 h-4 rounded"
+                      style={{ backgroundColor: status.color }}
+                    />
+                    {status.name}
+                  </Button>
+                ))}
+              </div>
+
+              <div className="flex justify-center pt-4">
                 <Button 
-                  onClick={handleSegmentSelection}
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
-                  disabled={selectedSegments.length === 0}
+                  variant="outline"
+                  onClick={handleBackToSegmentSelection}
                 >
-                  Seleccionar áreas
+                  Volver
                 </Button>
               </div>
             </>

@@ -186,29 +186,29 @@ export function ToothComponent({
   };
 
   return (
-    <div className="flex flex-col items-center space-y-2">
+    <div className="flex flex-col items-center space-y-2 relative">
       {/* Dibujo del diente arriba */}
       <svg width="45" height="50" viewBox="0 0 45 50" className="hover:opacity-90">
         {renderToothDrawing()}
       </svg>
       
-      {/* Círculo con segmentos abajo */}
+      {/* Círculo con segmentos */}
       <div className="relative">
         <svg width="45" height="50" viewBox="0 0 45 50" className="hover:opacity-90">
           {renderCircleSegments()}
         </svg>
-        
-        {/* Número del diente - ahora redondo y clickeable */}
-        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-          <button
-            onClick={handleNumberClick}
-            className={`w-8 h-8 rounded-full text-xs font-semibold border-2 transition-colors cursor-pointer hover:scale-110 ${
-              isSelected ? 'text-white bg-blue-500 border-blue-600' : 'text-blue-600 bg-white border-blue-300 hover:bg-blue-50'
-            }`}
-          >
-            {number}
-          </button>
-        </div>
+      </div>
+      
+      {/* Número del diente - movido más abajo */}
+      <div className="mt-3">
+        <button
+          onClick={handleNumberClick}
+          className={`w-8 h-8 rounded-full text-xs font-semibold border-2 transition-colors cursor-pointer hover:scale-110 ${
+            isSelected ? 'text-white bg-blue-500 border-blue-600' : 'text-blue-600 bg-white border-blue-300 hover:bg-blue-50'
+          }`}
+        >
+          {number}
+        </button>
       </div>
     </div>
   );
