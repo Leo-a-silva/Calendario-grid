@@ -54,51 +54,14 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
 
   const teethNumbers = denticionType === 'permanente' ? permanentTeeth : primaryTeeth;
 
-  // Helper function to render teeth with separation
-  const renderTeethWithSeparation = (teeth: number[]) => {
-    const leftSide = teeth.slice(0, teeth.length / 2);
-    const rightSide = teeth.slice(teeth.length / 2);
-
-    return (
-      <div className="flex items-center gap-2">
-        <div className="flex gap-2">
-          {leftSide.map((toothNumber) => (
-            <ToothComponent
-              key={toothNumber}
-              number={toothNumber}
-              procedures={toothStates[toothNumber]?.procedures || []}
-              onClick={() => handleToothClick(toothNumber)}
-              onSegmentClick={handleSegmentClick}
-              isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
-              isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
-            />
-          ))}
-        </div>
-        
-        {/* Separación central */}
-        <div className="w-6 flex justify-center">
-          <div className="w-0.5 h-16 bg-gray-400"></div>
-        </div>
-        
-        <div className="flex gap-2">
-          {rightSide.map((toothNumber) => (
-            <ToothComponent
-              key={toothNumber}
-              number={toothNumber}
-              procedures={toothStates[toothNumber]?.procedures || []}
-              onClick={() => handleToothClick(toothNumber)}
-              onSegmentClick={handleSegmentClick}
-              isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
-              isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   const handleToothClick = (toothNumber: number) => {
     setSelectedTooth(toothNumber);
+  };
+
+  const handleToothNumberClick = (toothNumber: number) => {
+    setSelectedTooth(toothNumber);
+    setSelectedSegment(null);
+    setIsSegmentModalOpen(true);
   };
 
   const handleSegmentClick = (toothNumber: number, segment: string) => {
@@ -138,7 +101,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
         const currentTooth = updated[toothNumber] || { number: toothNumber, procedures: [] };
         
         const procedureSegments = isComplete 
-          ? ['oclusal', 'vestibular', 'lingual', 'mesial', 'distal'] as const
+          ? ['oclusal', 'vestibular', 'lingual', 'mesial', 'distal'] as ('oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal')[]
           : segments as ('oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal')[];
 
         const newProcedure = {
@@ -188,6 +151,44 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
     { id: 'frenectomia', name: 'Frenectomía' }
   ];
 
+  // Función para renderizar líneas conectoras entre dientes seleccionados
+  const renderConnectionLines = () => {
+    if (selectionState.selectedTeeth.length < 2 || selectionState.selectionMode !== 'multiple') {
+      return null;
+    }
+
+    const selectedNumbers = selectionState.selectedTeeth.map(t => t.toothNumber).sort((a, b) => a - b);
+    const lines = [];
+
+    for (let i = 0; i < selectedNumbers.length - 1; i++) {
+      const from = selectedNumbers[i];
+      const to = selectedNumbers[i + 1];
+      
+      // Solo conectar dientes consecutivos o cercanos
+      if (Math.abs(from - to) <= 10) {
+        lines.push(
+          <div
+            key={`line-${from}-${to}`}
+            className="absolute h-0.5 bg-blue-500 z-10"
+            style={{
+              top: '50%',
+              left: `${(from % 10) * 10}%`,
+              width: `${Math.abs(to - from) * 10}%`,
+              transform: 'translateY(-50%)'
+            }}
+          />
+        );
+      }
+    }
+
+    return lines;
+  };
+
+  const isToothCompletelySelected = (toothNumber: number) => {
+    const tooth = selectionState.selectedTeeth.find(t => t.toothNumber === toothNumber);
+    return tooth ? tooth.isComplete : false;
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -214,7 +215,6 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
         </div>
         
         <div className="flex items-center space-x-6">
-          {/* ... keep existing code (filters and select) */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Checkbox 
@@ -260,7 +260,9 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
       </div>
 
       {/* Contenedor del odontograma */}
-      <div className="bg-white p-6 rounded-lg border shadow-sm">
+      <div className="bg-white p-6 rounded-lg border shadow-sm relative">
+        {renderConnectionLines()}
+        
         {/* Dientes superiores */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-2">
@@ -272,8 +274,10 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                   procedures={toothStates[toothNumber]?.procedures || []}
                   onClick={() => handleToothClick(toothNumber)}
                   onSegmentClick={handleSegmentClick}
+                  onNumberClick={handleToothNumberClick}
                   isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
                   isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
+                  isToothCompletelySelected={isToothCompletelySelected(toothNumber)}
                 />
               ))}
             </div>
@@ -291,8 +295,10 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                   procedures={toothStates[toothNumber]?.procedures || []}
                   onClick={() => handleToothClick(toothNumber)}
                   onSegmentClick={handleSegmentClick}
+                  onNumberClick={handleToothNumberClick}
                   isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
                   isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
+                  isToothCompletelySelected={isToothCompletelySelected(toothNumber)}
                 />
               ))}
             </div>
@@ -313,8 +319,10 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                   procedures={toothStates[toothNumber]?.procedures || []}
                   onClick={() => handleToothClick(toothNumber)}
                   onSegmentClick={handleSegmentClick}
+                  onNumberClick={handleToothNumberClick}
                   isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
                   isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
+                  isToothCompletelySelected={isToothCompletelySelected(toothNumber)}
                 />
               ))}
             </div>
@@ -332,8 +340,10 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
                   procedures={toothStates[toothNumber]?.procedures || []}
                   onClick={() => handleToothClick(toothNumber)}
                   onSegmentClick={handleSegmentClick}
+                  onNumberClick={handleToothNumberClick}
                   isSelected={selectedTooth === toothNumber || isToothSelected(toothNumber)}
                   isSegmentSelected={(segment) => isSegmentSelected(toothNumber, segment)}
+                  isToothCompletelySelected={isToothCompletelySelected(toothNumber)}
                 />
               ))}
             </div>

@@ -28,6 +28,10 @@ export function SegmentSelectionModal({
   onApplySelection
 }: SegmentSelectionModalProps) {
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [showQuadrants, setShowQuadrants] = useState(false);
+  const [showSegmentSelection, setShowSegmentSelection] = useState(false);
+  const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
+  
   const { 
     selectionState, 
     addToothSelection, 
@@ -44,11 +48,27 @@ export function SegmentSelectionModal({
     "Seleccionar área del diente"
   ];
 
+  const segments = [
+    { id: 'oclusal', name: 'Oclusal (centro)' },
+    { id: 'vestibular', name: 'Vestibular (exterior)' },
+    { id: 'lingual', name: 'Lingual (interior)' },
+    { id: 'mesial', name: 'Mesial (izquierda)' },
+    { id: 'distal', name: 'Distal (derecha)' }
+  ];
+
   const handleTaskToggle = (task: string) => {
     setSelectedTasks(prev => 
       prev.includes(task) 
         ? prev.filter(t => t !== task)
         : [...prev, task]
+    );
+  };
+
+  const handleSegmentToggle = (segmentId: string) => {
+    setSelectedSegments(prev => 
+      prev.includes(segmentId) 
+        ? prev.filter(s => s !== segmentId)
+        : [...prev, segmentId]
     );
   };
 
@@ -62,38 +82,73 @@ export function SegmentSelectionModal({
           setSelectionMode('single');
           break;
           
-        case "Seleccionar más dientes":
+        case "Selecc`ionar más dientes":
           if (segment) {
             addToothSelection(toothNumber, [segment]);
           } else {
             addToothSelection(toothNumber, [], true);
           }
           setSelectionMode('multiple');
-          // No cerramos el modal para permitir más selecciones
+          // Mostrar popup de selección múltiple
+          showMultipleSelectionPopup();
           return;
           
         case "Seleccionar cuadrantes o dentición completa":
-          showQuadrantSelection();
+          setShowQuadrants(true);
           return;
           
         case "Seleccionar área del diente":
-          if (segment) {
-            addToothSelection(toothNumber, [segment]);
-          }
-          setSelectionMode('single');
-          break;
+          setShowSegmentSelection(true);
+          return;
       }
     });
 
     onApplySelection();
     onClose();
-    setSelectedTasks([]);
+    resetModal();
   };
 
-  const [showQuadrants, setShowQuadrants] = useState(false);
-
-  const showQuadrantSelection = () => {
-    setShowQuadrants(true);
+  const showMultipleSelectionPopup = () => {
+    // Crear popup temporal para selección múltiple
+    const popup = document.createElement('div');
+    popup.className = 'fixed top-4 right-4 bg-white border border-blue-300 rounded-lg p-4 shadow-lg z-50';
+    popup.innerHTML = `
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+        <span class="text-sm font-medium">Seleccione más dientes haciendo click sobre el número del diente</span>
+      </div>
+      <div class="flex gap-2">
+        <button id="finalize-btn" class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">
+          Finalizar selección
+        </button>
+        <button id="cancel-btn" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">
+          Omitir selección
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(popup);
+    
+    // Manejar botones del popup
+    const finalizeBtn = popup.querySelector('#finalize-btn');
+    const cancelBtn = popup.querySelector('#cancel-btn');
+    
+    finalizeBtn?.addEventListener('click', () => {
+      document.body.removeChild(popup);
+      onApplySelection();
+    });
+    
+    cancelBtn?.addEventListener('click', () => {
+      document.body.removeChild(popup);
+      clearSelection();
+    });
+    
+    // Auto-remover después de 10 segundos
+    setTimeout(() => {
+      if (document.body.contains(popup)) {
+        document.body.removeChild(popup);
+      }
+    }, 10000);
   };
 
   const handleQuadrantSelection = (quadrant: string) => {
@@ -105,14 +160,29 @@ export function SegmentSelectionModal({
     setSelectionMode('quadrant');
     onApplySelection();
     onClose();
-    setShowQuadrants(false);
+    resetModal();
+  };
+
+  const handleSegmentSelection = () => {
+    if (!toothNumber || selectedSegments.length === 0) return;
+    
+    addToothSelection(toothNumber, selectedSegments);
+    setSelectionMode('single');
+    onApplySelection();
+    onClose();
+    resetModal();
+  };
+
+  const resetModal = () => {
     setSelectedTasks([]);
+    setShowQuadrants(false);
+    setShowSegmentSelection(false);
+    setSelectedSegments([]);
   };
 
   const handleCancel = () => {
     onClose();
-    setSelectedTasks([]);
-    setShowQuadrants(false);
+    resetModal();
   };
 
   return (
@@ -120,12 +190,14 @@ export function SegmentSelectionModal({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-base text-gray-700">
-            {showQuadrants ? 'Seleccionar cuadrante' : `Diente ${toothNumber}${segment ? ` - ${segment}` : ''}`}
+            {showQuadrants ? 'Seleccionar cuadrante' : 
+             showSegmentSelection ? 'Seleccionar área del diente' :
+             `Diente ${toothNumber}${segment ? ` - ${segment}` : ''}`}
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
-          {!showQuadrants ? (
+          {!showQuadrants && !showSegmentSelection ? (
             <>
               {/* Lista de tareas con checkboxes */}
               <div className="space-y-3">
@@ -176,7 +248,7 @@ export function SegmentSelectionModal({
                 </Button>
               </div>
             </>
-          ) : (
+          ) : showQuadrants ? (
             <>
               {/* Selección de cuadrantes */}
               <div className="space-y-3">
@@ -223,6 +295,42 @@ export function SegmentSelectionModal({
                   onClick={() => setShowQuadrants(false)}
                 >
                   Volver
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Selección de segmentos */}
+              <div className="space-y-3">
+                <p className="text-sm text-gray-600 mb-3">
+                  Selecciona las áreas del diente que deseas trabajar:
+                </p>
+                {segments.map((segment) => (
+                  <div key={segment.id} className="flex items-center space-x-3">
+                    <Checkbox 
+                      id={segment.id}
+                      checked={selectedSegments.includes(segment.id)}
+                      onCheckedChange={() => handleSegmentToggle(segment.id)}
+                      className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                    />
+                    <label htmlFor={segment.id} className="text-sm text-gray-700">{segment.name}</label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-center gap-2 pt-4">
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowSegmentSelection(false)}
+                >
+                  Volver
+                </Button>
+                <Button 
+                  onClick={handleSegmentSelection}
+                  className="bg-blue-500 hover:bg-blue-600 text-white"
+                  disabled={selectedSegments.length === 0}
+                >
+                  Seleccionar áreas
                 </Button>
               </div>
             </>

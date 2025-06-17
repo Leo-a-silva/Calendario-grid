@@ -1,3 +1,4 @@
+
 interface Procedure {
   type: 'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona' | 'ninguno';
   status: 'diagnostico' | 'realizado' | 'pendiente';
@@ -9,10 +10,22 @@ interface ToothComponentProps {
   procedures: Procedure[];
   onClick: () => void;
   onSegmentClick: (toothNumber: number, segment: string) => void;
+  onNumberClick: (toothNumber: number) => void;
   isSelected?: boolean;
+  isSegmentSelected?: (segment: string) => boolean;
+  isToothCompletelySelected?: boolean;
 }
 
-export function ToothComponent({ number, procedures, onClick, onSegmentClick, isSelected = false }: ToothComponentProps) {
+export function ToothComponent({ 
+  number, 
+  procedures, 
+  onClick, 
+  onSegmentClick, 
+  onNumberClick,
+  isSelected = false,
+  isSegmentSelected = () => false,
+  isToothCompletelySelected = false
+}: ToothComponentProps) {
   const getSegmentColor = (segment: string) => {
     const procedureForSegment = procedures.find(p => p.segments.includes(segment as any));
     if (!procedureForSegment) return 'white';
@@ -41,7 +54,7 @@ export function ToothComponent({ number, procedures, onClick, onSegmentClick, is
 
   const renderToothDrawing = () => {
     const commonProps = {
-      fill: isSelected ? "#93c5fd" : "#e5e7eb",
+      fill: isToothCompletelySelected ? "#3B82F6" : (isSelected ? "#93c5fd" : "#e5e7eb"),
       stroke: isSelected ? "#2563eb" : "#9ca3af",
       strokeWidth: isSelected ? "2" : "1"
     };
@@ -115,7 +128,7 @@ export function ToothComponent({ number, procedures, onClick, onSegmentClick, is
         {/* Segmento Superior (Vestibular) */}
         <path
           d={`M ${centerX} ${centerY} L ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX} ${centerY - radius} Z`}
-          fill={getSegmentColor('vestibular')}
+          fill={isSegmentSelected('vestibular') ? '#3B82F6' : getSegmentColor('vestibular')}
           stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
@@ -125,7 +138,7 @@ export function ToothComponent({ number, procedures, onClick, onSegmentClick, is
         {/* Segmento Derecho (Distal) */}
         <path
           d={`M ${centerX} ${centerY} L ${centerX} ${centerY - radius} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY} Z`}
-          fill={getSegmentColor('distal')}
+          fill={isSegmentSelected('distal') ? '#3B82F6' : getSegmentColor('distal')}
           stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
@@ -135,7 +148,7 @@ export function ToothComponent({ number, procedures, onClick, onSegmentClick, is
         {/* Segmento Inferior (Lingual) */}
         <path
           d={`M ${centerX} ${centerY} L ${centerX + radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX} ${centerY + radius} Z`}
-          fill={getSegmentColor('lingual')}
+          fill={isSegmentSelected('lingual') ? '#3B82F6' : getSegmentColor('lingual')}
           stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
@@ -145,7 +158,7 @@ export function ToothComponent({ number, procedures, onClick, onSegmentClick, is
         {/* Segmento Izquierdo (Mesial) */}
         <path
           d={`M ${centerX} ${centerY} L ${centerX} ${centerY + radius} A ${radius} ${radius} 0 0 1 ${centerX - radius} ${centerY} Z`}
-          fill={getSegmentColor('mesial')}
+          fill={isSegmentSelected('mesial') ? '#3B82F6' : getSegmentColor('mesial')}
           stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
@@ -157,7 +170,7 @@ export function ToothComponent({ number, procedures, onClick, onSegmentClick, is
           cx={centerX}
           cy={centerY}
           r={radius * 0.4}
-          fill={getSegmentColor('oclusal')}
+          fill={isSegmentSelected('oclusal') ? '#3B82F6' : getSegmentColor('oclusal')}
           stroke="#9ca3af"
           strokeWidth="0.5"
           className="cursor-pointer hover:opacity-80"
@@ -165,6 +178,11 @@ export function ToothComponent({ number, procedures, onClick, onSegmentClick, is
         />
       </g>
     );
+  };
+
+  const handleNumberClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onNumberClick(number);
   };
 
   return (
@@ -180,13 +198,16 @@ export function ToothComponent({ number, procedures, onClick, onSegmentClick, is
           {renderCircleSegments()}
         </svg>
         
-        {/* Número del diente */}
-        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-          <span className={`text-xs font-semibold px-1 rounded border ${
-            isSelected ? 'text-blue-800 bg-blue-100 border-blue-300' : 'text-blue-600 bg-white border-gray-300'
-          }`}>
+        {/* Número del diente - ahora redondo y clickeable */}
+        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+          <button
+            onClick={handleNumberClick}
+            className={`w-8 h-8 rounded-full text-xs font-semibold border-2 transition-colors cursor-pointer hover:scale-110 ${
+              isSelected ? 'text-white bg-blue-500 border-blue-600' : 'text-blue-600 bg-white border-blue-300 hover:bg-blue-50'
+            }`}
+          >
             {number}
-          </span>
+          </button>
         </div>
       </div>
     </div>
