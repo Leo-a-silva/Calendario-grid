@@ -2,12 +2,14 @@
 import { useState } from "react";
 import { MiniCalendar } from "@/components/MiniCalendar";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
+import { AppointmentModal } from "@/components/AppointmentModal";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
 
   return (
     <div className="h-screen flex">
@@ -24,7 +26,7 @@ const Index = () => {
         
         <div className="flex-1 flex gap-6 p-6 mx-0 my-[80px]">
           <div className="flex flex-col gap-4">
-            <Button className="w-full">
+            <Button className="w-full" onClick={() => setAppointmentModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Agendar turnos
             </Button>
@@ -35,6 +37,11 @@ const Index = () => {
           <WeeklyCalendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
         </div>
       </div>
+      
+      <AppointmentModal 
+        open={appointmentModalOpen} 
+        onOpenChange={setAppointmentModalOpen} 
+      />
     </div>
   );
 };
