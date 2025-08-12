@@ -7,7 +7,7 @@ import { TreatmentSelectionModal } from "./TreatmentSelectionModal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 export interface ToothState {
   number: number;
@@ -113,7 +113,13 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
 
   const handleWorkTypeSelect = (workType: 'pendiente' | 'realizado' | 'diagnostico') => {
     setSelectedWorkType(workType);
-    setIsTreatmentModalOpen(true);
+    setIsWorkTypeModalOpen(false);
+    
+    // Mostrar advertencia para seleccionar tratamiento de abajo
+    toast({
+      title: "Tipo de trabajo seleccionado",
+      description: `Ahora seleccione uno de los tratamientos de abajo para aplicar como ${workType} al diente ${selectedTooth}`,
+    });
   };
 
   const handleTreatmentSelect = (treatment: string) => {
@@ -144,7 +150,10 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
       };
     });
 
-    toast.success(`${treatment} aplicado como ${selectedWorkType} al diente ${selectedTooth}`);
+    toast({
+      title: "Tratamiento aplicado",
+      description: `${treatment} aplicado como ${selectedWorkType} al diente ${selectedTooth}`,
+    });
     
     // Reset estados
     setSelectedTooth(null);
@@ -159,7 +168,8 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
 
   const handleTaskSelect = (tasks: string[]) => {
     console.log("Selected tasks:", tasks);
-    // Aquí puedes implementar la lógica específica para cada tarea seleccionada
+    setIsSegmentModalOpen(false);
+    setIsWorkTypeModalOpen(true);
   };
 
   const handleProcedureSelect = (procedure: string) => {
@@ -167,31 +177,9 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
   };
 
   const applyProcedureToTooth = () => {
-    if (!selectedTooth || !selectedProcedure) return;
+    if (!selectedTooth || !selectedProcedure || !selectedWorkType) return;
 
-    setToothStates(prev => {
-      const currentTooth = prev[selectedTooth] || { number: selectedTooth, procedures: [] };
-      
-      const updatedProcedures = [
-        ...currentTooth.procedures,
-        {
-          type: selectedProcedure as any,
-          status: 'diagnostico' as const,
-          segments: ['oclusal' as const]
-        }
-      ];
-
-      return {
-        ...prev,
-        [selectedTooth]: {
-          ...currentTooth,
-          procedures: updatedProcedures
-        }
-      };
-    });
-
-    setSelectedTooth(null);
-    setSelectedProcedure(null);
+    handleTreatmentSelect(selectedProcedure);
   };
 
   const procedures = [
@@ -368,13 +356,13 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
           ))}
         </div>
         
-        {selectedTooth && selectedProcedure && (
+        {selectedTooth && selectedWorkType && selectedProcedure && (
           <div className="mt-4 flex justify-center">
             <Button 
               onClick={applyProcedureToTooth}
               className="bg-blue-500 hover:bg-blue-600 text-white"
             >
-              Aplicar {procedures.find(p => p.id === selectedProcedure)?.name} al diente {selectedTooth}
+              Aplicar {procedures.find(p => p.id === selectedProcedure)?.name} como {selectedWorkType} al diente {selectedTooth}
             </Button>
           </div>
         )}
@@ -404,15 +392,6 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
         onClose={() => setIsWorkTypeModalOpen(false)}
         toothNumber={selectedTooth}
         onWorkTypeSelect={handleWorkTypeSelect}
-      />
-
-      {/* Modal de selección de tratamiento */}
-      <TreatmentSelectionModal
-        isOpen={isTreatmentModalOpen}
-        onClose={() => setIsTreatmentModalOpen(false)}
-        toothNumber={selectedTooth}
-        workType={selectedWorkType}
-        onTreatmentSelect={handleTreatmentSelect}
       />
     </div>
   );

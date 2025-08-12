@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { OdontogramaChart } from "@/components/OdontogramaChart";
 import { Card, CardContent } from "@/components/ui/card";
+import { Toaster } from "@/components/ui/toaster";
 
 const Odontograma = () => {
   const [denticionType, setDenticionType] = useState<'permanente' | 'primaria'>('permanente');
@@ -15,6 +16,7 @@ const Odontograma = () => {
           </CardContent>
         </Card>
       </div>
+      <Toaster />
     </div>
   );
 };
