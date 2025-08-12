@@ -2,9 +2,12 @@ import { useState } from "react";
 import { ToothComponent } from "./ToothComponent";
 import { SegmentSelectionModal } from "./SegmentSelectionModal";
 import { QuadrantSelectionModal } from "./QuadrantSelectionModal";
+import { WorkTypeModal } from "./WorkTypeModal";
+import { TreatmentSelectionModal } from "./TreatmentSelectionModal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 export interface ToothState {
   number: number;
@@ -24,6 +27,9 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
   const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
   const [isSegmentModalOpen, setIsSegmentModalOpen] = useState(false);
   const [isQuadrantModalOpen, setIsQuadrantModalOpen] = useState(false);
+  const [isWorkTypeModalOpen, setIsWorkTypeModalOpen] = useState(false);
+  const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
+  const [selectedWorkType, setSelectedWorkType] = useState<'pendiente' | 'realizado' | 'diagnostico' | null>(null);
   const [toothStates, setToothStates] = useState<{ [key: number]: ToothState }>({});
   const [selectedProcedure, setSelectedProcedure] = useState<string | null>(null);
   const [filters, setFilters] = useState({
@@ -90,6 +96,7 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
 
   const handleToothClick = (toothNumber: number) => {
     setSelectedTooth(toothNumber);
+    setIsWorkTypeModalOpen(true);
   };
 
   const handleNumberClick = (toothNumber: number) => {
@@ -102,6 +109,47 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
     setSelectedTooth(toothNumber);
     setSelectedSegment(segment);
     setIsQuadrantModalOpen(true);
+  };
+
+  const handleWorkTypeSelect = (workType: 'pendiente' | 'realizado' | 'diagnostico') => {
+    setSelectedWorkType(workType);
+    setIsTreatmentModalOpen(true);
+  };
+
+  const handleTreatmentSelect = (treatment: string) => {
+    if (!selectedTooth || !selectedWorkType) return;
+
+    // Aplicar el tratamiento a todo el diente (todos los segmentos)
+    const allSegments: ('oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal')[] = 
+      ['oclusal', 'vestibular', 'lingual', 'mesial', 'distal'];
+
+    setToothStates(prev => {
+      const currentTooth = prev[selectedTooth] || { number: selectedTooth, procedures: [] };
+      
+      const updatedProcedures = [
+        ...currentTooth.procedures,
+        {
+          type: treatment as any,
+          status: selectedWorkType,
+          segments: allSegments
+        }
+      ];
+
+      return {
+        ...prev,
+        [selectedTooth]: {
+          ...currentTooth,
+          procedures: updatedProcedures
+        }
+      };
+    });
+
+    toast.success(`${treatment} aplicado como ${selectedWorkType} al diente ${selectedTooth}`);
+    
+    // Reset estados
+    setSelectedTooth(null);
+    setSelectedWorkType(null);
+    setSelectedProcedure(null);
   };
 
   const handleQuadrantConfirm = () => {
@@ -348,6 +396,23 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
         toothNumber={selectedTooth}
         segmentName={selectedSegment}
         onConfirm={handleQuadrantConfirm}
+      />
+
+      {/* Modal de selección de tipo de trabajo */}
+      <WorkTypeModal
+        isOpen={isWorkTypeModalOpen}
+        onClose={() => setIsWorkTypeModalOpen(false)}
+        toothNumber={selectedTooth}
+        onWorkTypeSelect={handleWorkTypeSelect}
+      />
+
+      {/* Modal de selección de tratamiento */}
+      <TreatmentSelectionModal
+        isOpen={isTreatmentModalOpen}
+        onClose={() => setIsTreatmentModalOpen(false)}
+        toothNumber={selectedTooth}
+        workType={selectedWorkType}
+        onTreatmentSelect={handleTreatmentSelect}
       />
     </div>
   );
