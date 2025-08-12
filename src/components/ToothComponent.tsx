@@ -183,8 +183,14 @@ export function ToothComponent({
 
   return (
     <div className="flex flex-col items-center space-y-2">
-      {/* Dibujo del diente arriba */}
-      <svg width="45" height="50" viewBox="0 0 45 50" className="hover:opacity-90">
+      {/* Dibujo del diente arriba - clickeable para selección completa */}
+      <svg 
+        width="45" 
+        height="50" 
+        viewBox="0 0 45 50" 
+        className="hover:opacity-90 cursor-pointer" 
+        onClick={onClick}
+      >
         {renderToothDrawing()}
       </svg>
       
