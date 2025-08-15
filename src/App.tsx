@@ -9,6 +9,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { AppHeader } from "@/components/AppHeader";
 import Index from "./pages/Index";
 import Odontograma from "./pages/Odontograma";
+import Pacientes from "./pages/Pacientes";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
               <main className="flex-1">
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/pacientes" element={<Pacientes />} />
                   <Route path="/odontograma" element={<Odontograma />} />
                 </Routes>
               </main>
