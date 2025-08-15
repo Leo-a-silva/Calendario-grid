@@ -35,13 +35,13 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map(item => <SidebarMenuItem key={item.title}>
+              {items.map(item => <SidebarMenuItem key={item.title} className="bg-blue-700">
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={({
                   isActive: navIsActive
                 }) => `flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${isActive(item.url) || navIsActive ? "bg-primary text-primary-foreground font-medium" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`}>
                       <item.icon className="w-4 h-4" />
-                      <span className="text-blue-700">{item.title}</span>
+                      <span>{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>)}
