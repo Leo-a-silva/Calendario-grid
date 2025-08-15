@@ -4,6 +4,7 @@ import { SegmentSelectionModal } from "./SegmentSelectionModal";
 import { QuadrantSelectionModal } from "./QuadrantSelectionModal";
 import { WorkTypeModal } from "./WorkTypeModal";
 import { TreatmentSelectionModal } from "./TreatmentSelectionModal";
+import { ToothAreaSelectionModal } from "./ToothAreaSelectionModal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -29,9 +30,11 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
   const [isQuadrantModalOpen, setIsQuadrantModalOpen] = useState(false);
   const [isWorkTypeModalOpen, setIsWorkTypeModalOpen] = useState(false);
   const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
+  const [isAreaSelectionModalOpen, setIsAreaSelectionModalOpen] = useState(false);
   const [selectedWorkType, setSelectedWorkType] = useState<'pendiente' | 'realizado' | 'diagnostico' | null>(null);
   const [toothStates, setToothStates] = useState<{ [key: number]: ToothState }>({});
   const [selectedProcedure, setSelectedProcedure] = useState<string | null>(null);
+  const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     diagnostico: true,
     realizados: true,
@@ -111,7 +114,13 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
     setIsQuadrantModalOpen(true);
   };
 
-  const handleWorkTypeSelect = (workType: 'pendiente' | 'realizado' | 'diagnostico') => {
+  const handleWorkTypeSelect = (workType: 'pendiente' | 'realizado' | 'diagnostico' | 'select-area') => {
+    if (workType === 'select-area') {
+      // Mostrar modal de selección de área
+      setIsAreaSelectionModalOpen(true);
+      return;
+    }
+    
     setSelectedWorkType(workType);
     setIsWorkTypeModalOpen(false);
     
@@ -121,25 +130,64 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
       description: `Ahora seleccione uno de los tratamientos de abajo para aplicar como ${workType} al diente ${selectedTooth}`,
     });
   };
+  
+  const handleAreaSelect = (area: string) => {
+    setSelectedArea(area);
+    setSelectedWorkType('diagnostico'); // Establecer un tipo de trabajo por defecto
+    setIsAreaSelectionModalOpen(false);
+    
+    // Mostrar advertencia para seleccionar tratamiento
+    toast({
+      title: "Área seleccionada",
+      description: `Ahora seleccione uno de los tratamientos de abajo para aplicar al área ${area} del diente ${selectedTooth}`,
+    });
+  };
 
   const handleTreatmentSelect = (treatment: string) => {
-    if (!selectedTooth || !selectedWorkType) return;
+    if (!selectedTooth) return;
 
-    // Aplicar el tratamiento a todo el diente (todos los segmentos)
-    const allSegments: ('oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal')[] = 
-      ['oclusal', 'vestibular', 'lingual', 'mesial', 'distal'];
+    // Si hay un área seleccionada, aplicamos solo a esa área
+    // Si no, aplicamos a todo el diente (todos los segmentos)
+    const segmentsToApply = selectedArea 
+      ? [selectedArea as 'oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal']
+      : ['oclusal', 'vestibular', 'lingual', 'mesial', 'distal'];
+
+    // Usamos el workType seleccionado o asumimos 'diagnostico' si estamos en modo área
+    const status = selectedWorkType || 'diagnostico';
 
     setToothStates(prev => {
       const currentTooth = prev[selectedTooth] || { number: selectedTooth, procedures: [] };
       
-      const updatedProcedures = [
-        ...currentTooth.procedures,
-        {
-          type: treatment as any,
-          status: selectedWorkType,
-          segments: allSegments
-        }
-      ];
+      // Buscar si ya existe un procedimiento del mismo tipo y estado para combinar segmentos
+      const existingProcedureIndex = currentTooth.procedures.findIndex(
+        p => p.type === treatment && p.status === status
+      );
+
+      let updatedProcedures;
+      
+      if (existingProcedureIndex >= 0) {
+        // Si ya existe un procedimiento del mismo tipo, actualizamos los segmentos
+        const existingProcedure = currentTooth.procedures[existingProcedureIndex];
+        const combinedSegments = [...new Set([...existingProcedure.segments, ...segmentsToApply])];
+        
+        updatedProcedures = [...currentTooth.procedures];
+        updatedProcedures[existingProcedureIndex] = {
+          ...existingProcedure,
+          segments: combinedSegments,
+          date: new Date() // Actualizamos la fecha
+        };
+      } else {
+        // Si no existe, añadimos un nuevo procedimiento
+        updatedProcedures = [
+          ...currentTooth.procedures,
+          {
+            type: treatment as any,
+            status,
+            segments: segmentsToApply,
+            date: new Date()
+          }
+        ];
+      }
 
       return {
         ...prev,
@@ -150,15 +198,17 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
       };
     });
 
+    const statusText = status;
+    
     toast({
       title: "Tratamiento aplicado",
-      description: `${treatment} aplicado como ${selectedWorkType} al diente ${selectedTooth}`,
+      description: `${treatment} aplicado ${selectedArea ? `al área ${selectedArea} ` : ''}del diente ${selectedTooth} como ${statusText}`,
     });
     
     // Reset estados
-    setSelectedTooth(null);
     setSelectedWorkType(null);
     setSelectedProcedure(null);
+    setSelectedArea(null);
   };
 
   const handleQuadrantConfirm = () => {
@@ -392,6 +442,17 @@ export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
         onClose={() => setIsWorkTypeModalOpen(false)}
         toothNumber={selectedTooth}
         onWorkTypeSelect={handleWorkTypeSelect}
+      />
+
+      {/* Modal de selección de área del diente */}
+      <ToothAreaSelectionModal
+        isOpen={isAreaSelectionModalOpen}
+        onClose={() => {
+          setIsAreaSelectionModalOpen(false);
+          setIsWorkTypeModalOpen(true);
+        }}
+        onAreaSelect={handleAreaSelect}
+        toothNumber={selectedTooth || 0}
       />
     </div>
   );

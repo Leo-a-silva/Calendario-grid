@@ -1,8 +1,12 @@
 
-interface Procedure {
+import { useState } from "react";
+import { TreatmentDetailsModal } from "./TreatmentDetailsModal";
+
+export interface Procedure {
   type: 'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona' | 'ninguno';
   status: 'diagnostico' | 'realizado' | 'pendiente';
   segments: ('oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal')[];
+  date?: Date;
 }
 
 interface ToothComponentProps {
@@ -16,12 +20,22 @@ interface ToothComponentProps {
 
 export function ToothComponent({ 
   number, 
-  procedures, 
+  procedures = [], 
   onClick, 
   onSegmentClick, 
   onNumberClick,
   isSelected = false 
 }: ToothComponentProps) {
+  const [showDetails, setShowDetails] = useState(false);
+
+  const handleToothClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (procedures && procedures.length > 0) {
+      setShowDetails(true);
+    } else {
+      onClick();
+    }
+  };
   const getSegmentColor = (segment: string) => {
     const procedureForSegment = procedures.find(p => p.segments.includes(segment as any));
     if (!procedureForSegment) return 'white';
@@ -183,13 +197,23 @@ export function ToothComponent({
 
   return (
     <div className="flex flex-col items-center space-y-2">
+      {/* Modal de detalles del tratamiento */}
+      {procedures && procedures.length > 0 && (
+        <TreatmentDetailsModal
+          isOpen={showDetails}
+          onClose={() => setShowDetails(false)}
+          toothNumber={number}
+          procedures={procedures}
+        />
+      )}
+      
       {/* Dibujo del diente arriba - clickeable para selección completa */}
       <svg 
         width="45" 
         height="50" 
         viewBox="0 0 45 50" 
         className="hover:opacity-90 cursor-pointer" 
-        onClick={onClick}
+        onClick={handleToothClick}
       >
         {renderToothDrawing()}
       </svg>
@@ -206,9 +230,11 @@ export function ToothComponent({
         <button
           onClick={handleNumberClick}
           className={`w-8 h-8 rounded-full text-xs font-semibold border-2 transition-colors hover:opacity-80 ${
-            isSelected 
-              ? 'text-blue-800 bg-blue-100 border-blue-500' 
-              : 'text-blue-600 bg-white border-blue-300 hover:border-blue-400'
+            procedures && procedures.length > 0
+              ? 'text-white bg-blue-500 border-blue-600 hover:bg-blue-600' 
+              : isSelected 
+                ? 'text-blue-800 bg-blue-100 border-blue-500' 
+                : 'text-blue-600 bg-white border-blue-300 hover:border-blue-400'
           }`}
         >
           {number}
