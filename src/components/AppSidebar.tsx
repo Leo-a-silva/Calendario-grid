@@ -33,7 +33,7 @@ export function AppSidebar() {
           <SidebarGroupLabel className="text-primary font-semibold">
             Menú Principal
           </SidebarGroupLabel>
-          <SidebarGroupContent>
+          <SidebarGroupContent className="my-[5px] mx-0">
             <SidebarMenu>
               {items.map(item => <SidebarMenuItem key={item.title} className="bg-blue-700">
                   <SidebarMenuButton asChild>
