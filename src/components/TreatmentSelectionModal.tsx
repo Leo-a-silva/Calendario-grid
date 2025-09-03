@@ -12,7 +12,7 @@ import {
   FileSpreadsheet, 
   FileText, 
   Filter, 
-  Flask2, 
+  Beaker, 
   HeartPulse, 
   Home, 
   LayoutTemplate, 
@@ -20,7 +20,7 @@ import {
   Scissors, 
   Stethoscope, 
   Syringe, 
-  Tooth, 
+  Circle, 
   XCircle, 
   Zap, 
   Info 
@@ -50,13 +50,13 @@ export function TreatmentSelectionModal({
     { id: 'blanqueamiento', name: 'Blanqueamiento', icon: <Zap className="h-5 w-5" /> },
     { id: 'radiografias', name: 'Radiografías', icon: <FileSpreadsheet className="h-5 w-5" /> },
     { id: 'selladores', name: 'Selladores', icon: <Filter className="h-5 w-5" /> },
-    { id: 'endodoncia', name: 'Endodoncia', icon: <Tooth className="h-5 w-5" /> },
+    { id: 'endodoncia', name: 'Endodoncia', icon: <Circle className="h-5 w-5" /> },
     { id: 'implantes', name: 'Implantes', icon: <Bone className="h-5 w-5" /> },
     { id: 'coronas', name: 'Coronas', icon: <CircleDashed className="h-5 w-5" /> },
     { id: 'puentes', name: 'Puentes', icon: <LayoutTemplate className="h-5 w-5" /> },
     { id: 'carillas', name: 'Carillas', icon: <FileText className="h-5 w-5" /> },
     { id: 'apicectomia', name: 'Apicectomía', icon: <Scissors className="h-5 w-5" /> },
-    { id: 'prostodoncia', name: 'Prostodoncia', icon: <Tooth className="h-5 w-5" /> },
+    { id: 'prostodoncia', name: 'Prostodoncia', icon: <Circle className="h-5 w-5" /> },
     { id: 'cirugia', name: 'Cirugía maxilofacial', icon: <Scissors className="h-5 w-5" /> },
     { id: 'ortodoncia', name: 'Ortodoncia', icon: <Braces className="h-5 w-5" /> },
     { id: 'placa', name: 'Placa antibruxismo', icon: <Home className="h-5 w-5" /> },
@@ -103,16 +103,16 @@ export function TreatmentSelectionModal({
             </AlertDescription>
           </Alert>
           
-          <div className="grid grid-cols-4 gap-3 max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
             {treatments.map((treatment) => (
               <Button
                 key={treatment.id}
                 variant="outline"
-                className="w-full justify-start gap-2"
+                className="w-full justify-start gap-2 p-3 h-auto flex-col sm:flex-row text-xs sm:text-sm"
                 onClick={() => handleTreatmentClick(treatment.id)}
               >
-                <span className="text-primary">{treatment.icon}</span>
-                <span>{treatment.name}</span>
+                <span className="text-primary flex-shrink-0">{treatment.icon}</span>
+                <span className="text-center sm:text-left">{treatment.name}</span>
               </Button>
             ))}
           </div>

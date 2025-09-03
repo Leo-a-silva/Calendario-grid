@@ -258,12 +258,12 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+      {/* Responsive header with filters */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <h2 className="text-xl font-bold">Odontograma</h2>
         
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
+          <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center space-x-2">
               <Checkbox 
                 id="diagnostico" 
@@ -296,7 +296,7 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
           </div>
 
           <Select defaultValue={denticionType}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Seleccionar dentición" />
             </SelectTrigger>
             <SelectContent>
@@ -307,102 +307,125 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
         </div>
       </div>
 
-      {/* Contenedor del odontograma */}
-      <div className="bg-white p-6 rounded-lg border shadow-sm">
-        {/* Dientes superiores */}
-        <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-2">
-            <div className="flex gap-2">
-              {teethNumbers.superior.slice(0, teethNumbers.superior.length / 2).map((toothNumber) => (
-                <ToothComponent
-                  key={toothNumber}
-                  number={toothNumber}
-                  procedures={toothStates[toothNumber]?.procedures || []}
-                  onClick={() => handleToothClick(toothNumber)}
-                  onSegmentClick={handleSegmentClick}
-                  onNumberClick={handleNumberClick}
-                  isSelected={selectedTooth === toothNumber}
-                />
-              ))}
-            </div>
+      {/* Responsive Odontogram Container */}
+      <div className="bg-white p-4 md:p-6 rounded-lg border shadow-sm">
+        <div className="space-y-6 md:space-y-8">
+          {/* Upper quadrants */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-center text-muted-foreground mb-4">Dientes Superiores</h3>
             
-            {/* Separación central */}
-            <div className="w-6 flex justify-center">
-              <div className="w-0.5 h-16 bg-gray-400"></div>
-            </div>
-            
-            <div className="flex gap-2">
-              {teethNumbers.superior.slice(teethNumbers.superior.length / 2).map((toothNumber) => (
-                <ToothComponent
-                  key={toothNumber}
-                  number={toothNumber}
-                  procedures={toothStates[toothNumber]?.procedures || []}
-                  onClick={() => handleToothClick(toothNumber)}
-                  onSegmentClick={handleSegmentClick}
-                  onNumberClick={handleNumberClick}
-                  isSelected={selectedTooth === toothNumber}
-                />
-              ))}
+            {/* Desktop: side by side, Mobile: stacked */}
+            <div className="flex flex-col lg:flex-row lg:justify-center gap-4 lg:gap-8">
+              {/* Right upper quadrant (18-11) */}
+              <div className="flex justify-center">
+                <div className="flex gap-1 sm:gap-2">
+                  {teethNumbers.superior.slice(0, teethNumbers.superior.length / 2).map((toothNumber) => (
+                    <ToothComponent
+                      key={toothNumber}
+                      number={toothNumber}
+                      procedures={toothStates[toothNumber]?.procedures || []}
+                      onClick={() => handleToothClick(toothNumber)}
+                      onSegmentClick={handleSegmentClick}
+                      onNumberClick={handleNumberClick}
+                      isSelected={selectedTooth === toothNumber}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              {/* Vertical separator on desktop, horizontal on mobile */}
+              <div className="flex justify-center">
+                <div className="lg:w-0.5 lg:h-16 w-16 h-0.5 bg-border"></div>
+              </div>
+              
+              {/* Left upper quadrant (21-28) */}
+              <div className="flex justify-center">
+                <div className="flex gap-1 sm:gap-2">
+                  {teethNumbers.superior.slice(teethNumbers.superior.length / 2).map((toothNumber) => (
+                    <ToothComponent
+                      key={toothNumber}
+                      number={toothNumber}
+                      procedures={toothStates[toothNumber]?.procedures || []}
+                      onClick={() => handleToothClick(toothNumber)}
+                      onSegmentClick={handleSegmentClick}
+                      onNumberClick={handleNumberClick}
+                      isSelected={selectedTooth === toothNumber}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Línea separadora */}
-        <div className="border-t border-gray-300 my-6"></div>
+          {/* Main horizontal separator */}
+          <div className="border-t border-border"></div>
 
-        {/* Dientes inferiores */}
-        <div className="flex justify-center">
-          <div className="flex items-center gap-2">
-            <div className="flex gap-2">
-              {teethNumbers.inferior.slice(0, teethNumbers.inferior.length / 2).map((toothNumber) => (
-                <ToothComponent
-                  key={toothNumber}
-                  number={toothNumber}
-                  procedures={toothStates[toothNumber]?.procedures || []}
-                  onClick={() => handleToothClick(toothNumber)}
-                  onSegmentClick={handleSegmentClick}
-                  onNumberClick={handleNumberClick}
-                  isSelected={selectedTooth === toothNumber}
-                />
-              ))}
-            </div>
+          {/* Lower quadrants */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-center text-muted-foreground mb-4">Dientes Inferiores</h3>
             
-            {/* Separación central */}
-            <div className="w-6 flex justify-center">
-              <div className="w-0.5 h-16 bg-gray-400"></div>
-            </div>
-            
-            <div className="flex gap-2">
-              {teethNumbers.inferior.slice(teethNumbers.inferior.length / 2).map((toothNumber) => (
-                <ToothComponent
-                  key={toothNumber}
-                  number={toothNumber}
-                  procedures={toothStates[toothNumber]?.procedures || []}
-                  onClick={() => handleToothClick(toothNumber)}
-                  onSegmentClick={handleSegmentClick}
-                  onNumberClick={handleNumberClick}
-                  isSelected={selectedTooth === toothNumber}
-                />
-              ))}
+            {/* Desktop: side by side, Mobile: stacked */}
+            <div className="flex flex-col lg:flex-row lg:justify-center gap-4 lg:gap-8">
+              {/* Right lower quadrant (48-41) */}
+              <div className="flex justify-center">
+                <div className="flex gap-1 sm:gap-2">
+                  {teethNumbers.inferior.slice(0, teethNumbers.inferior.length / 2).map((toothNumber) => (
+                    <ToothComponent
+                      key={toothNumber}
+                      number={toothNumber}
+                      procedures={toothStates[toothNumber]?.procedures || []}
+                      onClick={() => handleToothClick(toothNumber)}
+                      onSegmentClick={handleSegmentClick}
+                      onNumberClick={handleNumberClick}
+                      isSelected={selectedTooth === toothNumber}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              {/* Vertical separator on desktop, horizontal on mobile */}
+              <div className="flex justify-center">
+                <div className="lg:w-0.5 lg:h-16 w-16 h-0.5 bg-border"></div>
+              </div>
+              
+              {/* Left lower quadrant (31-38) */}
+              <div className="flex justify-center">
+                <div className="flex gap-1 sm:gap-2">
+                  {teethNumbers.inferior.slice(teethNumbers.inferior.length / 2).map((toothNumber) => (
+                    <ToothComponent
+                      key={toothNumber}
+                      number={toothNumber}
+                      procedures={toothStates[toothNumber]?.procedures || []}
+                      onClick={() => handleToothClick(toothNumber)}
+                      onSegmentClick={handleSegmentClick}
+                      onNumberClick={handleNumberClick}
+                      isSelected={selectedTooth === toothNumber}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Panel de procedimientos */}
-      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
-        <div className="grid grid-cols-10 gap-4">
+      {/* Responsive procedures panel */}
+      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 md:p-6">
+        <h3 className="text-sm font-medium text-center text-muted-foreground mb-4">Procedimientos</h3>
+        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-4">
           {procedures.map((procedure) => (
-            <div key={procedure.id} className="flex flex-col items-center gap-2">
+            <div key={procedure.id} className="flex flex-col items-center gap-1 md:gap-2">
               <button
-                className={`w-12 h-12 rounded-full border-2 transition-colors ${
+                className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full border-2 transition-colors ${
                   selectedProcedure === procedure.id 
                     ? 'bg-blue-500 border-blue-600' 
                     : 'bg-white border-gray-300 hover:border-blue-400'
                 }`}
                 onClick={() => handleProcedureSelect(procedure.id)}
               />
-              <span className="text-xs text-center font-medium text-gray-700">{procedure.name}</span>
+              <span className="text-xs text-center font-medium text-gray-700 leading-tight">
+                {procedure.name}
+              </span>
             </div>
           ))}
         </div>
@@ -411,7 +434,7 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
           <div className="mt-4 flex justify-center">
             <Button 
               onClick={applyProcedureToTooth}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
+              className="bg-blue-500 hover:bg-blue-600 text-white text-sm md:text-base"
             >
               Aplicar {procedures.find(p => p.id === selectedProcedure)?.name} como {selectedWorkType} al diente {selectedTooth}
             </Button>

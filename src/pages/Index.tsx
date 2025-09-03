@@ -11,17 +11,30 @@ const Index = () => {
   const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
 
   return (
-    <div className="flex gap-6 p-6">
-      <div className="flex flex-col gap-4">
-        <Button className="w-full" onClick={() => setAppointmentModalOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Agendar turnos
-        </Button>
-        
-        <MiniCalendar selectedDate={selectedDate} onDateSelect={setSelectedDate} />
+    <div className="min-h-screen bg-background p-4 md:p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header with Add Appointment Button */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-2xl font-bold text-foreground">Calendario</h1>
+          <Button onClick={() => setAppointmentModalOpen(true)} className="w-full sm:w-auto">
+            <Plus className="w-4 h-4 mr-2" />
+            Agendar turnos
+          </Button>
+        </div>
+
+        {/* Responsive Layout */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Mini Calendar - Above on mobile, left on desktop */}
+          <div className="w-full lg:w-80 flex-shrink-0">
+            <MiniCalendar selectedDate={selectedDate} onDateSelect={setSelectedDate} />
+          </div>
+          
+          {/* Weekly Calendar - Below on mobile, right on desktop */}
+          <div className="flex-1 min-w-0">
+            <WeeklyCalendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
+          </div>
+        </div>
       </div>
-      
-      <WeeklyCalendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
       
       <AppointmentModal 
         open={appointmentModalOpen} 
