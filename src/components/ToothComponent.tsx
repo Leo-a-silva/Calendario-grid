@@ -196,7 +196,7 @@ export function ToothComponent({
   };
 
   return (
-    <div className="flex flex-col items-center space-y-2">
+    <div className="flex flex-col items-center space-y-1 sm:space-y-2">
       {/* Modal de detalles del tratamiento */}
       {procedures && procedures.length > 0 && (
         <TreatmentDetailsModal
@@ -209,10 +209,10 @@ export function ToothComponent({
       
       {/* Dibujo del diente arriba - clickeable para selección completa */}
       <svg 
-        width="45" 
-        height="50" 
+        width="32" 
+        height="36" 
         viewBox="0 0 45 50" 
-        className="hover:opacity-90 cursor-pointer" 
+        className="hover:opacity-90 cursor-pointer sm:w-9 sm:h-10 md:w-11 md:h-12" 
         onClick={handleToothClick}
       >
         {renderToothDrawing()}
@@ -220,16 +220,16 @@ export function ToothComponent({
       
       {/* Círculo con segmentos */}
       <div className="relative">
-        <svg width="45" height="50" viewBox="0 0 45 50" className="hover:opacity-90">
+        <svg width="32" height="36" viewBox="0 0 45 50" className="hover:opacity-90 sm:w-9 sm:h-10 md:w-11 md:h-12">
           {renderCircleSegments()}
         </svg>
       </div>
 
       {/* Número del diente más abajo y redondo */}
-      <div className="mt-2">
+      <div className="mt-1">
         <button
           onClick={handleNumberClick}
-          className={`w-8 h-8 rounded-full text-xs font-semibold border-2 transition-colors hover:opacity-80 ${
+          className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full text-xs font-semibold border-2 transition-colors hover:opacity-80 ${
             procedures && procedures.length > 0
               ? 'text-white bg-blue-500 border-blue-600 hover:bg-blue-600' 
               : isSelected 
@@ -237,7 +237,7 @@ export function ToothComponent({
                 : 'text-blue-600 bg-white border-blue-300 hover:border-blue-400'
           }`}
         >
-          {number}
+          <span className="text-xs sm:text-sm">{number}</span>
         </button>
       </div>
     </div>

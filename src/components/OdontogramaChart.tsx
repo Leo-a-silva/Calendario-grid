@@ -315,10 +315,10 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
             <h3 className="text-sm font-medium text-center text-muted-foreground mb-4">Dientes Superiores</h3>
             
             {/* Desktop: side by side, Mobile: stacked */}
-            <div className="flex flex-col lg:flex-row lg:justify-center gap-4 lg:gap-8">
+            <div className="flex flex-col lg:flex-row lg:justify-center gap-2 lg:gap-8">
               {/* Right upper quadrant (18-11) */}
               <div className="flex justify-center">
-                <div className="flex gap-1 sm:gap-2">
+                <div className="flex gap-0.5 sm:gap-1 md:gap-2">
                   {teethNumbers.superior.slice(0, teethNumbers.superior.length / 2).map((toothNumber) => (
                     <ToothComponent
                       key={toothNumber}
@@ -334,13 +334,13 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
               </div>
               
               {/* Vertical separator on desktop, horizontal on mobile */}
-              <div className="flex justify-center">
-                <div className="lg:w-0.5 lg:h-16 w-16 h-0.5 bg-border"></div>
+              <div className="flex justify-center py-1 lg:py-0">
+                <div className="lg:w-0.5 lg:h-16 w-12 h-0.5 bg-border"></div>
               </div>
               
               {/* Left upper quadrant (21-28) */}
               <div className="flex justify-center">
-                <div className="flex gap-1 sm:gap-2">
+                <div className="flex gap-0.5 sm:gap-1 md:gap-2">
                   {teethNumbers.superior.slice(teethNumbers.superior.length / 2).map((toothNumber) => (
                     <ToothComponent
                       key={toothNumber}
@@ -365,10 +365,10 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
             <h3 className="text-sm font-medium text-center text-muted-foreground mb-4">Dientes Inferiores</h3>
             
             {/* Desktop: side by side, Mobile: stacked */}
-            <div className="flex flex-col lg:flex-row lg:justify-center gap-4 lg:gap-8">
+            <div className="flex flex-col lg:flex-row lg:justify-center gap-2 lg:gap-8">
               {/* Right lower quadrant (48-41) */}
               <div className="flex justify-center">
-                <div className="flex gap-1 sm:gap-2">
+                <div className="flex gap-0.5 sm:gap-1 md:gap-2">
                   {teethNumbers.inferior.slice(0, teethNumbers.inferior.length / 2).map((toothNumber) => (
                     <ToothComponent
                       key={toothNumber}
@@ -384,13 +384,13 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
               </div>
               
               {/* Vertical separator on desktop, horizontal on mobile */}
-              <div className="flex justify-center">
-                <div className="lg:w-0.5 lg:h-16 w-16 h-0.5 bg-border"></div>
+              <div className="flex justify-center py-1 lg:py-0">
+                <div className="lg:w-0.5 lg:h-16 w-12 h-0.5 bg-border"></div>
               </div>
               
               {/* Left lower quadrant (31-38) */}
               <div className="flex justify-center">
-                <div className="flex gap-1 sm:gap-2">
+                <div className="flex gap-0.5 sm:gap-1 md:gap-2">
                   {teethNumbers.inferior.slice(teethNumbers.inferior.length / 2).map((toothNumber) => (
                     <ToothComponent
                       key={toothNumber}
