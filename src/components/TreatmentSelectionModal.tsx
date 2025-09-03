@@ -1,7 +1,30 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info } from "lucide-react";
+import { 
+  Activity, 
+  AlertCircle, 
+  Bone, 
+  Braces, 
+  CheckCircle2, 
+  CircleDashed, 
+  FileSearch, 
+  FileSpreadsheet, 
+  FileText, 
+  Filter, 
+  Flask2, 
+  HeartPulse, 
+  Home, 
+  LayoutTemplate, 
+  Pill, 
+  Scissors, 
+  Stethoscope, 
+  Syringe, 
+  Tooth, 
+  XCircle, 
+  Zap, 
+  Info 
+} from "lucide-react";
 
 interface TreatmentSelectionModalProps {
   isOpen: boolean;
@@ -20,26 +43,26 @@ export function TreatmentSelectionModal({
 }: TreatmentSelectionModalProps) {
   
   const treatments = [
-    { id: 'diagnostico', name: 'Diagnóstico' },
-    { id: 'limpieza', name: 'Limpieza' },
-    { id: 'obturacion', name: 'Obturación' },
-    { id: 'extraccion', name: 'Extracción' },
-    { id: 'blanqueamiento', name: 'Blanqueamiento' },
-    { id: 'radiografias', name: 'Radiografías' },
-    { id: 'selladores', name: 'Selladores' },
-    { id: 'endodoncia', name: 'Endodoncia' },
-    { id: 'implantes', name: 'Implantes' },
-    { id: 'coronas', name: 'Coronas' },
-    { id: 'puentes', name: 'Puentes' },
-    { id: 'carillas', name: 'Carillas' },
-    { id: 'apicectomia', name: 'Apicectomía' },
-    { id: 'prostodoncia', name: 'Prostodoncia' },
-    { id: 'cirugia', name: 'Cirugía maxilofacial' },
-    { id: 'ortodoncia', name: 'Ortodoncia' },
-    { id: 'placa', name: 'Placa antibruxismo' },
-    { id: 'periodoncia', name: 'Periodoncia' },
-    { id: 'fluor', name: 'Flúor' },
-    { id: 'frenectomia', name: 'Frenectomía' }
+    { id: 'diagnostico', name: 'Diagnóstico', icon: <FileSearch className="h-5 w-5" /> },
+    { id: 'limpieza', name: 'Limpieza', icon: <Zap className="h-5 w-5" /> },
+    { id: 'obturacion', name: 'Obturación', icon: <Activity className="h-5 w-5" /> },
+    { id: 'extraccion', name: 'Extracción', icon: <XCircle className="h-5 w-5" /> },
+    { id: 'blanqueamiento', name: 'Blanqueamiento', icon: <Zap className="h-5 w-5" /> },
+    { id: 'radiografias', name: 'Radiografías', icon: <FileSpreadsheet className="h-5 w-5" /> },
+    { id: 'selladores', name: 'Selladores', icon: <Filter className="h-5 w-5" /> },
+    { id: 'endodoncia', name: 'Endodoncia', icon: <Tooth className="h-5 w-5" /> },
+    { id: 'implantes', name: 'Implantes', icon: <Bone className="h-5 w-5" /> },
+    { id: 'coronas', name: 'Coronas', icon: <CircleDashed className="h-5 w-5" /> },
+    { id: 'puentes', name: 'Puentes', icon: <LayoutTemplate className="h-5 w-5" /> },
+    { id: 'carillas', name: 'Carillas', icon: <FileText className="h-5 w-5" /> },
+    { id: 'apicectomia', name: 'Apicectomía', icon: <Scissors className="h-5 w-5" /> },
+    { id: 'prostodoncia', name: 'Prostodoncia', icon: <Tooth className="h-5 w-5" /> },
+    { id: 'cirugia', name: 'Cirugía maxilofacial', icon: <Scissors className="h-5 w-5" /> },
+    { id: 'ortodoncia', name: 'Ortodoncia', icon: <Braces className="h-5 w-5" /> },
+    { id: 'placa', name: 'Placa antibruxismo', icon: <Home className="h-5 w-5" /> },
+    { id: 'periodoncia', name: 'Periodoncia', icon: <HeartPulse className="h-5 w-5" /> },
+    { id: 'fluor', name: 'Flúor', icon: <Pill className="h-5 w-5" /> },
+    { id: 'frenectomia', name: 'Frenectomía', icon: <Scissors className="h-5 w-5" /> }
   ];
 
   const getWorkTypeColor = () => {
@@ -84,13 +107,12 @@ export function TreatmentSelectionModal({
             {treatments.map((treatment) => (
               <Button
                 key={treatment.id}
-                onClick={() => handleTreatmentClick(treatment.id)}
                 variant="outline"
-                className="h-16 flex flex-col items-center justify-center text-center p-2"
+                className="w-full justify-start gap-2"
+                onClick={() => handleTreatmentClick(treatment.id)}
               >
-                <span className="text-xs font-medium leading-tight">
-                  {treatment.name}
-                </span>
+                <span className="text-primary">{treatment.icon}</span>
+                <span>{treatment.name}</span>
               </Button>
             ))}
           </div>

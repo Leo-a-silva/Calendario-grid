@@ -1,16 +1,122 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogTitle,
+  DialogActions,
+  Button,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormHelperText,
+  Box,
+  Typography,
+  Divider,
+  Paper,
+  IconButton,
+  InputAdornment,
+  useTheme
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { es } from 'date-fns/locale';
+import CloseIcon from '@mui/icons-material/Close';
+import PersonIcon from '@mui/icons-material/Person';
+import PhoneIcon from '@mui/icons-material/Phone';
+import BadgeIcon from '@mui/icons-material/Badge';
+import EventIcon from '@mui/icons-material/Event';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import InfoIcon from '@mui/icons-material/Info';
+import { useSnackbar } from 'notistack';
+
+// Estilos personalizados
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+  '& .MuiDialog-paper': {
+    borderRadius: 16,
+    maxWidth: 800,
+    width: '100%',
+    margin: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      margin: theme.spacing(1),
+    },
+  },
+}));
+
+const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: theme.spacing(2, 3),
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  '& .MuiTypography-root': {
+    fontWeight: 600,
+    color: theme.palette.primary.main,
+  },
+}));
+
+const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
+  padding: theme.spacing(3),
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(2),
+  },
+}));
+
+const FormSection = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  marginBottom: theme.spacing(3),
+  borderRadius: 12,
+  boxShadow: theme.shadows[1],
+  '&:last-child': {
+    marginBottom: 0,
+  },
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: theme.spacing(2),
+  color: theme.palette.primary.main,
+  '& .MuiSvgIcon-root': {
+    marginRight: theme.spacing(1),
+    fontSize: '1.25rem',
+  },
+}));
+
+const SubmitButton = styled(Button)(({ theme }) => ({
+  padding: theme.spacing(1.5, 4),
+  borderRadius: 12,
+  fontWeight: 600,
+  textTransform: 'none',
+  fontSize: '1rem',
+}));
+
+const CancelButton = styled(Button)(({ theme }) => ({
+  padding: theme.spacing(1.5, 4),
+  borderRadius: 12,
+  fontWeight: 500,
+  textTransform: 'none',
+  color: theme.palette.text.secondary,
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+interface AppointmentFormData {
+  nombre: string;
+  apellido: string;
+  dni: string;
+  sexo: string;
+  telefono: string;
+  motivo: string;
+  fecha: Date | null;
+  hora: Date | null;
+}
 
 interface AppointmentModalProps {
   open: boolean;
@@ -18,161 +124,234 @@ interface AppointmentModalProps {
 }
 
 export function AppointmentModal({ open, onOpenChange }: AppointmentModalProps) {
-  const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    dni: "",
-    sexo: "",
-    telefono: "",
-    motivo: "",
-    fecha: undefined as Date | undefined,
-    hora: ""
+  const { enqueueSnackbar } = useSnackbar();
+  const theme = useTheme();
+  
+  const form = useForm<AppointmentFormData>({
+    defaultValues: {
+      nombre: "",
+      apellido: "",
+      dni: "",
+      sexo: "",
+      telefono: "",
+      motivo: "",
+      fecha: null,
+      hora: null,
+    },
   });
 
-  const timeSlots = Array.from({ length: 12 }, (_, i) => {
-    const hour = i + 9;
-    return `${hour.toString().padStart(2, '0')}:00`;
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Datos del turno:", formData);
-    // Aquí se procesaría el formulario
+  const onSubmit = (data: AppointmentFormData) => {
+    console.log("Datos del turno:", data);
+    enqueueSnackbar(`Turno agendado correctamente para ${data.nombre} ${data.apellido}`, { 
+      variant: 'success',
+      autoHideDuration: 3000,
+    });
+    form.reset();
     onOpenChange(false);
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Agendar Turno</DialogTitle>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="nombre">Nombre</Label>
-              <Input
-                id="nombre"
-                value={formData.nombre}
-                onChange={(e) => handleInputChange("nombre", e.target.value)}
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="apellido">Apellido</Label>
-              <Input
-                id="apellido"
-                value={formData.apellido}
-                onChange={(e) => handleInputChange("apellido", e.target.value)}
-                required
-              />
-            </div>
-          </div>
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
+      <StyledDialog 
+        open={open} 
+        onClose={() => onOpenChange(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <StyledDialogTitle>
+          <Typography variant="h6">
+            <EventIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
+            Agendar Turno
+          </Typography>
+          <IconButton 
+            onClick={() => onOpenChange(false)}
+            size="small"
+            sx={{ color: 'text.secondary' }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </StyledDialogTitle>
 
-          <div className="space-y-2">
-            <Label htmlFor="dni">DNI</Label>
-            <Input
-              id="dni"
-              value={formData.dni}
-              onChange={(e) => handleInputChange("dni", e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Sexo</Label>
-            <Select value={formData.sexo} onValueChange={(value) => handleInputChange("sexo", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar sexo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="masculino">Masculino</SelectItem>
-                <SelectItem value="femenino">Femenino</SelectItem>
-                <SelectItem value="otro">Otro</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="telefono">Teléfono</Label>
-            <Input
-              id="telefono"
-              value={formData.telefono}
-              onChange={(e) => handleInputChange("telefono", e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="motivo">Motivo de consulta</Label>
-            <Textarea
-              id="motivo"
-              value={formData.motivo}
-              onChange={(e) => handleInputChange("motivo", e.target.value)}
-              rows={3}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Fecha</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !formData.fecha && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formData.fecha ? format(formData.fecha, "PPP", { locale: es }) : "Seleccionar fecha"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={formData.fecha}
-                  onSelect={(date) => setFormData(prev => ({ ...prev, fecha: date }))}
-                  initialFocus
-                  className="pointer-events-auto"
+        <StyledDialogContent>
+          <Box component="form" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormSection>
+              <SectionTitle variant="subtitle1">
+                <PersonIcon />
+                Datos del Paciente
+              </SectionTitle>
+              
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mb: 3 }}>
+                <TextField
+                  fullWidth
+                  label="Nombre"
+                  variant="outlined"
+                  size="small"
+                  {...form.register('nombre', { required: 'Este campo es requerido' })}
+                  error={!!form.formState.errors.nombre}
+                  helperText={form.formState.errors.nombre?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonIcon color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Hora</Label>
-            <Select value={formData.hora} onValueChange={(value) => handleInputChange("hora", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar hora" />
-              </SelectTrigger>
-              <SelectContent>
-                {timeSlots.map((time) => (
-                  <SelectItem key={time} value={time}>
-                    {time}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-              Cancelar
-            </Button>
-            <Button type="submit" className="flex-1">
-              Agendar Turno
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+                
+                <TextField
+                  fullWidth
+                  label="Apellido"
+                  variant="outlined"
+                  size="small"
+                  {...form.register('apellido', { required: 'Este campo es requerido' })}
+                  error={!!form.formState.errors.apellido}
+                  helperText={form.formState.errors.apellido?.message}
+                />
+                
+                <TextField
+                  fullWidth
+                  label="DNI"
+                  variant="outlined"
+                  size="small"
+                  {...form.register('dni', { 
+                    required: 'Este campo es requerido',
+                    pattern: {
+                      value: /^\d{7,8}$/,
+                      message: 'Ingrese un DNI válido (7 u 8 dígitos)'
+                    }
+                  })}
+                  error={!!form.formState.errors.dni}
+                  helperText={form.formState.errors.dni?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <BadgeIcon color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                
+                <FormControl fullWidth size="small" error={!!form.formState.errors.sexo}>
+                  <InputLabel>Sexo</InputLabel>
+                  <Select
+                    label="Sexo"
+                    {...form.register('sexo', { required: 'Este campo es requerido' })}
+                    defaultValue=""
+                  >
+                    <MenuItem value="masculino">Masculino</MenuItem>
+                    <MenuItem value="femenino">Femenino</MenuItem>
+                    <MenuItem value="otro">Otro</MenuItem>
+                  </Select>
+                  {form.formState.errors.sexo && (
+                    <FormHelperText>{form.formState.errors.sexo.message}</FormHelperText>
+                  )}
+                </FormControl>
+                
+                <TextField
+                  fullWidth
+                  label="Teléfono"
+                  variant="outlined"
+                  size="small"
+                  {...form.register('telefono')}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PhoneIcon color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
+              
+              <TextField
+                fullWidth
+                label="Motivo de la consulta"
+                variant="outlined"
+                size="small"
+                multiline
+                rows={3}
+                {...form.register('motivo')}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <InfoIcon color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </FormSection>
+            
+            <FormSection>
+              <SectionTitle variant="subtitle1">
+                <EventIcon />
+                Fecha y Hora
+              </SectionTitle>
+              
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+                <DatePicker
+                  label="Fecha del turno"
+                  value={form.watch('fecha')}
+                  onChange={(date) => form.setValue('fecha', date)}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      size: 'small',
+                      required: true,
+                      error: !!form.formState.errors.fecha,
+                      helperText: form.formState.errors.fecha?.message,
+                      InputProps: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <EventIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      },
+                    },
+                  }}
+                />
+                
+                <TimePicker
+                  label="Hora del turno"
+                  value={form.watch('hora')}
+                  onChange={(time) => form.setValue('hora', time)}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      size: 'small',
+                      required: true,
+                      error: !!form.formState.errors.hora,
+                      helperText: form.formState.errors.hora?.message,
+                      InputProps: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <AccessTimeIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </FormSection>
+            
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+              <CancelButton 
+                variant="text" 
+                onClick={() => onOpenChange(false)}
+              >
+                Cancelar
+              </CancelButton>
+              <SubmitButton 
+                variant="contained" 
+                color="primary"
+                type="submit"
+              >
+                Confirmar Turno
+              </SubmitButton>
+            </Box>
+          </Box>
+        </StyledDialogContent>
+      </StyledDialog>
+    </LocalizationProvider>
   );
 }

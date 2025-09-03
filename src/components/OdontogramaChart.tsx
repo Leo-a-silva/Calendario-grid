@@ -21,9 +21,10 @@ export interface ToothState {
 
 interface OdontogramaChartProps {
   denticionType: 'permanente' | 'primaria';
+  pacienteId?: string | number;
 }
 
-export function OdontogramaChart({ denticionType }: OdontogramaChartProps) {
+export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChartProps) {
   const [selectedTooth, setSelectedTooth] = useState<number | null>(null);
   const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
   const [isSegmentModalOpen, setIsSegmentModalOpen] = useState(false);

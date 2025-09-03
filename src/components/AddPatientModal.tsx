@@ -13,6 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { CalendarIcon, PlusCircle, UserPlus } from "lucide-react";
+import { format } from "date-fns";
+import { es } from 'date-fns/locale';
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface PatientFormData {
   nombre: string;
@@ -90,25 +101,32 @@ export const AddPatientModal = ({ open, onOpenChange }: AddPatientModalProps) =>
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Agregar Nuevo Paciente</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
+            <UserPlus className="w-6 h-6" />
+            Nuevo Paciente
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
               <FormField
                 control={form.control}
                 name="nombre"
                 rules={{ required: "El nombre es requerido" }}
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre</FormLabel>
+                  <FormItem className="space-y-1">
+                    <FormLabel className="text-sm font-medium text-gray-700">Nombre</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nombre" {...field} />
+                      <Input 
+                        placeholder="Ingrese el nombre" 
+                        {...field} 
+                        className="h-10 focus-visible:ring-primary/50 border-gray-300 focus:border-primary/50 transition-colors"
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs text-red-500" />
                   </FormItem>
                 )}
               />
@@ -118,12 +136,16 @@ export const AddPatientModal = ({ open, onOpenChange }: AddPatientModalProps) =>
                 name="apellido"
                 rules={{ required: "El apellido es requerido" }}
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Apellido</FormLabel>
+                  <FormItem className="space-y-1">
+                    <FormLabel className="text-sm font-medium text-gray-700">Apellido</FormLabel>
                     <FormControl>
-                      <Input placeholder="Apellido" {...field} />
+                      <Input 
+                        placeholder="Ingrese el apellido" 
+                        {...field} 
+                        className="h-10 focus-visible:ring-primary/50 border-gray-300 focus:border-primary/50 transition-colors"
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs text-red-500" />
                   </FormItem>
                 )}
               />
@@ -133,12 +155,40 @@ export const AddPatientModal = ({ open, onOpenChange }: AddPatientModalProps) =>
                 name="fechaNacimiento"
                 rules={{ required: "La fecha de nacimiento es requerida" }}
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Fecha de Nacimiento</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
+                  <FormItem className="space-y-1">
+                    <FormLabel className="text-sm font-medium text-gray-700">Fecha de Nacimiento</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full h-10 pl-3 text-left font-normal justify-start bg-white border-gray-300 hover:bg-gray-50",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(new Date(field.value), "PPP", { locale: es })
+                            ) : (
+                              <span>Seleccione una fecha</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage className="text-xs text-red-500" />
                   </FormItem>
                 )}
               />
@@ -335,15 +385,20 @@ export const AddPatientModal = ({ open, onOpenChange }: AddPatientModalProps) =>
               </div>
             )}
 
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-6">
+              <Button 
+                type="button" 
+                variant="outline" 
                 onClick={() => onOpenChange(false)}
+                className="border-gray-300 text-gray-700 hover:bg-gray-50"
               >
                 Cancelar
               </Button>
-              <Button type="submit">
+              <Button 
+                type="submit" 
+                className="bg-primary hover:bg-primary/90 text-white"
+              >
+                <PlusCircle className="w-4 h-4 mr-2" />
                 Guardar Paciente
               </Button>
             </div>

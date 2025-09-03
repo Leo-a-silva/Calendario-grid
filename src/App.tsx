@@ -29,6 +29,7 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/pacientes" element={<Pacientes />} />
                   <Route path="/odontograma" element={<Odontograma />} />
+                  <Route path="/odontograma/:pacienteId" element={<Odontograma />} />
                 </Routes>
               </main>
             </div>
