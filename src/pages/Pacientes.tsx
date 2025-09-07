@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search, List, Eye, User, FileText, CreditCard, UserPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AddPatientModal } from "@/components/AddPatientModal";
+import { useData } from "@/contexts/DataContext";
 import {
   Table,
   TableBody,
@@ -16,38 +17,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Mock data for demonstration
-const mockPatients = [
-  {
-    id: 1,
-    nombre: "Juan",
-    apellido: "Pérez",
-    dni: "12345678",
-    numeroHistoriaClinica: "HC001",
-  },
-  {
-    id: 2,
-    nombre: "María",
-    apellido: "González",
-    dni: "23456789",
-    numeroHistoriaClinica: "HC002",
-  },
-  {
-    id: 3,
-    nombre: "Carlos",
-    apellido: "Rodríguez",
-    dni: "34567890",
-    numeroHistoriaClinica: "HC003",
-  },
-];
-
 const Pacientes = () => {
   const navigate = useNavigate();
+  const { patients } = useData();
   const [addPatientModalOpen, setAddPatientModalOpen] = useState(false);
   const [showPatientsList, setShowPatientsList] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredPatients = mockPatients.filter(patient => 
+  const filteredPatients = patients.filter(patient =>
     patient.dni.includes(searchTerm) || 
     `${patient.nombre} ${patient.apellido}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.numeroHistoriaClinica.toLowerCase().includes(searchTerm.toLowerCase())

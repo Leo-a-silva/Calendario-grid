@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useData } from "@/contexts/DataContext";
 import { cn } from "@/lib/utils";
 import { CalendarIcon, PlusCircle, UserPlus } from "lucide-react";
 import { format } from "date-fns";
@@ -62,6 +63,7 @@ interface AddPatientModalProps {
 
 export const AddPatientModal = ({ open, onOpenChange }: AddPatientModalProps) => {
   const { toast } = useToast();
+  const { addPatient } = useData();
   const [showObraSocialFields, setShowObraSocialFields] = useState(false);
   
   const form = useForm<PatientFormData>({
@@ -84,14 +86,32 @@ export const AddPatientModal = ({ open, onOpenChange }: AddPatientModalProps) =>
   });
 
   const onSubmit = (data: PatientFormData) => {
-    console.log("Datos del paciente:", data);
-    toast({
-      title: "Paciente agregado",
-      description: `${data.nombre} ${data.apellido} ha sido agregado exitosamente.`,
-    });
-    form.reset();
-    setShowObraSocialFields(false);
-    onOpenChange(false);
+    try {
+      const newPatient = addPatient({
+        nombre: data.nombre,
+        apellido: data.apellido,
+        dni: data.dni,
+        numeroHistoriaClinica: data.numeroHistoriaClinica,
+        telefono: data.telefono,
+        email: data.email,
+        fechaNacimiento: data.fechaNacimiento,
+      });
+      
+      toast({
+        title: "Paciente agregado",
+        description: `${newPatient.nombre} ${newPatient.apellido} ha sido agregado exitosamente.`,
+      });
+      
+      form.reset();
+      setShowObraSocialFields(false);
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo agregar el paciente. Intente nuevamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCoberturaChange = (value: string) => {

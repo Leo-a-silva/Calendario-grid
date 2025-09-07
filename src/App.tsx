@@ -12,6 +12,7 @@ import Odontograma from "./pages/Odontograma";
 import Pacientes from "./pages/Pacientes";
 import LoginForm from "./components/LoginForm";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { DataProvider } from "./contexts/DataContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -82,11 +83,13 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <Router>
-          <SidebarProvider>
-            <AppRoutes />
-          </SidebarProvider>
-        </Router>
+        <DataProvider>
+          <Router>
+            <SidebarProvider>
+              <AppRoutes />
+            </SidebarProvider>
+          </Router>
+        </DataProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

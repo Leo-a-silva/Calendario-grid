@@ -4,6 +4,7 @@ import { es } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useData } from "@/contexts/DataContext";
 
 interface Appointment {
   id: string;
@@ -33,6 +34,7 @@ const timeSlots = Array.from({ length: 12 }, (_, i) => {
 const weekDays = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
 export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarProps) {
+  const { appointments } = useData();
   const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
@@ -45,11 +47,24 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
   };
 
   const getAppointmentsForDayAndTime = (dayIndex: number, time: string) => {
-    if (dayIndex >= 1 && dayIndex <= 5 && Math.random() > 0.7) {
-      const randomAppointment = sampleAppointments[Math.floor(Math.random() * sampleAppointments.length)];
-      return [randomAppointment];
-    }
-    return [];
+    const currentDate = weekDates[dayIndex];
+    const formattedDate = format(currentDate, 'yyyy-MM-dd');
+    
+    // Get appointments for this specific date and time
+    const dayAppointments = appointments.filter(appointment => 
+      appointment.date === formattedDate && appointment.time === time
+    );
+    
+    // Convert to the expected format for the calendar
+    return dayAppointments.map(appointment => ({
+      id: appointment.id.toString(),
+      title: appointment.type,
+      time: appointment.time,
+      duration: 1,
+      type: "turnos" as const,
+      patient: appointment.patientName,
+      doctor: "Dr. Sistema",
+    }));
   };
 
   return (
