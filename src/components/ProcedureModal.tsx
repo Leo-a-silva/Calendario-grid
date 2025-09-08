@@ -8,6 +8,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { 
+  FileSearch, 
+  Sparkles, 
+  FileX, 
+  Scissors, 
+  Activity, 
+  Crown,
+  Wrench,
+  Zap,
+  CircleDot,
+  Bone,
+  Camera,
+  Smile
+} from "lucide-react";
 
 interface ProcedureModalProps {
   isOpen: boolean;
@@ -27,18 +41,18 @@ export function ProcedureModal({ isOpen, onClose, toothNumber, onProcedureSelect
   ];
 
   const procedures = [
-    { id: 'diagnostico', name: 'Diagnóstico', icon: '🦷' },
-    { id: 'limpieza', name: 'Limpieza', icon: '🧽' },
-    { id: 'obturacion', name: 'Obturación', icon: '🔧' },
-    { id: 'extraccion', name: 'Extracción', icon: '✂️' },
-    { id: 'endodoncia', name: 'Endodoncia', icon: '⚕️' },
-    { id: 'corona', name: 'Corona', icon: '👑' },
-    { id: 'aparatologia', name: 'Aparatología', icon: '🔧' },
-    { id: 'periodontologia', name: 'Periodontología', icon: '🦠' },
-    { id: 'cirugia', name: 'Cirugía', icon: '⚕️' },
-    { id: 'implante', name: 'Implante', icon: '🔩' },
-    { id: 'radiografia', name: 'Radiografía', icon: '📱' },
-    { id: 'protesis', name: 'Prótesis', icon: '🦷' }
+    { id: 'diagnostico', name: 'Diagnóstico', icon: <FileSearch className="h-6 w-6" /> },
+    { id: 'limpieza', name: 'Limpieza', icon: <Sparkles className="h-6 w-6" /> },
+    { id: 'obturacion', name: 'Obturación', icon: <FileX className="h-6 w-6" /> },
+    { id: 'extraccion', name: 'Extracción', icon: <Scissors className="h-6 w-6" /> },
+    { id: 'endodoncia', name: 'Endodoncia', icon: <Activity className="h-6 w-6" /> },
+    { id: 'corona', name: 'Corona', icon: <Crown className="h-6 w-6" /> },
+    { id: 'aparatologia', name: 'Aparatología', icon: <Wrench className="h-6 w-6" /> },
+    { id: 'periodontologia', name: 'Periodontología', icon: <Zap className="h-6 w-6" /> },
+    { id: 'cirugia', name: 'Cirugía', icon: <Scissors className="h-6 w-6" /> },
+    { id: 'implante', name: 'Implante', icon: <Bone className="h-6 w-6" /> },
+    { id: 'radiografia', name: 'Radiografía', icon: <Camera className="h-6 w-6" /> },
+    { id: 'protesis', name: 'Prótesis', icon: <Smile className="h-6 w-6" /> }
   ];
 
   const handleTaskToggle = (task: string) => {
@@ -58,7 +72,7 @@ export function ProcedureModal({ isOpen, onClose, toothNumber, onProcedureSelect
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center text-lg">
-            Diente {toothNumber} - Seleccionar procedimiento
+            Diente {toothNumber} - Seleccionar tratamiento
           </DialogTitle>
         </DialogHeader>
         
@@ -93,9 +107,9 @@ export function ProcedureModal({ isOpen, onClose, toothNumber, onProcedureSelect
                   variant="outline"
                   className="flex flex-col items-center gap-2 h-20 bg-white hover:bg-blue-100 border-blue-200"
                   onClick={() => handleProcedureClick(procedure.id)}
-                >
-                  <span className="text-2xl">{procedure.icon}</span>
-                  <span className="text-xs text-center font-medium">{procedure.name}</span>
+                  >
+                    <span className="text-primary">{procedure.icon}</span>
+                    <span className="text-xs text-center font-medium">{procedure.name}</span>
                 </Button>
               ))}
             </div>

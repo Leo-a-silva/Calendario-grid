@@ -1,6 +1,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  FileSearch, 
+  Sparkles, 
+  FileX, 
+  Scissors, 
+  Activity, 
+  Crown 
+} from "lucide-react";
 
 interface ProcedurePanelProps {
   selectedProcedure: 'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona';
@@ -9,19 +17,19 @@ interface ProcedurePanelProps {
 
 export function ProcedurePanel({ selectedProcedure, onProcedureSelect }: ProcedurePanelProps) {
   const procedures = [
-    { id: 'diagnostico' as const, name: 'Diagnóstico', icon: '🔍', color: 'bg-blue-500' },
-    { id: 'limpieza' as const, name: 'Limpieza', icon: '🧽', color: 'bg-green-500' },
-    { id: 'obturacion' as const, name: 'Obturación', icon: '🦷', color: 'bg-yellow-500' },
-    { id: 'extraccion' as const, name: 'Extracción', icon: '🔧', color: 'bg-red-500' },
-    { id: 'endodoncia' as const, name: 'Endodoncia', icon: '⚕️', color: 'bg-purple-500' },
-    { id: 'corona' as const, name: 'Corona', icon: '👑', color: 'bg-orange-500' },
+    { id: 'diagnostico' as const, name: 'Diagnóstico', icon: <FileSearch className="h-6 w-6" />, color: 'bg-blue-500' },
+    { id: 'limpieza' as const, name: 'Limpieza', icon: <Sparkles className="h-6 w-6" />, color: 'bg-green-500' },
+    { id: 'obturacion' as const, name: 'Obturación', icon: <FileX className="h-6 w-6" />, color: 'bg-yellow-500' },
+    { id: 'extraccion' as const, name: 'Extracción', icon: <Scissors className="h-6 w-6" />, color: 'bg-red-500' },
+    { id: 'endodoncia' as const, name: 'Endodoncia', icon: <Activity className="h-6 w-6" />, color: 'bg-purple-500' },
+    { id: 'corona' as const, name: 'Corona', icon: <Crown className="h-6 w-6" />, color: 'bg-orange-500' },
   ];
 
   return (
     <Card className="mt-8">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-center">
-          Seleccionar Procedimiento
+          Seleccionar Tratamiento
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -34,9 +42,9 @@ export function ProcedurePanel({ selectedProcedure, onProcedureSelect }: Procedu
                 selectedProcedure === procedure.id ? procedure.color + ' text-white' : ''
               }`}
               onClick={() => onProcedureSelect(procedure.id)}
-            >
-              <span className="text-2xl">{procedure.icon}</span>
-              <span className="text-xs">{procedure.name}</span>
+              >
+                <span className="text-primary">{procedure.icon}</span>
+                <span className="text-xs">{procedure.name}</span>
             </Button>
           ))}
         </div>

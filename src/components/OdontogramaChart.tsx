@@ -411,7 +411,7 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
 
       {/* Responsive procedures panel */}
       <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 md:p-6">
-        <h3 className="text-sm font-medium text-center text-muted-foreground mb-4">Procedimientos</h3>
+        <h3 className="text-sm font-medium text-center text-muted-foreground mb-4">Tratamientos</h3>
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-4">
           {procedures.map((procedure) => (
             <div key={procedure.id} className="flex flex-col items-center gap-1 md:gap-2">
