@@ -304,8 +304,12 @@ const Odontograma = () => {
             </div>
           </CardHeader>
           <CardContent className="p-4 md:p-6">
-            <div className="border rounded-lg p-4 md:p-6 bg-card shadow-inner flex items-center justify-center min-h-[400px]">
-              <OdontogramaChart denticionType={denticionType} pacienteId={paciente.id} />
+            <div className="flex-1 p-6 space-y-6">
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="max-w-5xl mx-auto scale-125 transform origin-top">
+                  <OdontogramaChart denticionType={denticionType} pacienteId={paciente.id} />
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
