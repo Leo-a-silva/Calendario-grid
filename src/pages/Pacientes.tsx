@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, List, Eye, User, FileText, CreditCard, UserPlus } from "lucide-react";
+import { Plus, Search, List, Eye, User, FileText, CreditCard, UserPlus, Edit, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AddPatientModal } from "@/components/AddPatientModal";
-import { useData } from "@/contexts/DataContext";
+import { EditPatientModal } from "@/components/EditPatientModal";
+import { useData, Patient } from "@/contexts/DataContext";
 import {
   Table,
   TableBody,
@@ -16,11 +17,26 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const Pacientes = () => {
   const navigate = useNavigate();
-  const { patients } = useData();
+  const { patients, deletePatient } = useData();
   const [addPatientModalOpen, setAddPatientModalOpen] = useState(false);
+  const [editPatientModalOpen, setEditPatientModalOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState<Patient | null>(null);
   const [showPatientsList, setShowPatientsList] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -29,6 +45,25 @@ const Pacientes = () => {
     `${patient.nombre} ${patient.apellido}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.numeroHistoriaClinica.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleEditPatient = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setEditPatientModalOpen(true);
+  };
+
+  const handleDeletePatient = (patient: Patient) => {
+    setPatientToDelete(patient);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeletePatient = () => {
+    if (patientToDelete) {
+      deletePatient(patientToDelete.id);
+      toast.success(`Paciente ${patientToDelete.nombre} ${patientToDelete.apellido} eliminado exitosamente`);
+      setDeleteDialogOpen(false);
+      setPatientToDelete(null);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6 w-full max-w-7xl mx-auto">
@@ -94,7 +129,7 @@ const Pacientes = () => {
                     <TableHead className="w-[300px]">Paciente</TableHead>
                     <TableHead>DNI</TableHead>
                     <TableHead>Historia Clínica</TableHead>
-                    <TableHead className="w-[100px] text-center">Acciones</TableHead>
+                    <TableHead className="w-[140px] text-center">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -138,9 +173,19 @@ const Pacientes = () => {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 hover:bg-blue-100 hover:text-blue-600"
-                              title="Ver historial"
+                              onClick={() => handleEditPatient(patient)}
+                              title="Editar paciente"
                             >
-                              <CreditCard className="h-4 w-4" />
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-red-100 hover:text-red-600"
+                              onClick={() => handleDeletePatient(patient)}
+                              title="Eliminar paciente"
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>
@@ -263,6 +308,30 @@ const Pacientes = () => {
         open={addPatientModalOpen}
         onOpenChange={setAddPatientModalOpen}
       />
+      
+      <EditPatientModal 
+        patient={selectedPatient}
+        open={editPatientModalOpen}
+        onOpenChange={setEditPatientModalOpen}
+      />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará permanentemente el paciente{" "}
+              <strong>{patientToDelete?.nombre} {patientToDelete?.apellido}</strong> y todos sus turnos asociados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeletePatient} className="bg-red-600 hover:bg-red-700">
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
