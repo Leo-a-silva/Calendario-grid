@@ -4,7 +4,9 @@ import { es } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useData } from "@/contexts/DataContext";
+import { useData, Appointment as DataAppointment } from "@/contexts/DataContext";
+import { AppointmentDetailsModal } from "@/components/AppointmentDetailsModal";
+import { useState } from "react";
 
 interface Appointment {
   id: string;
@@ -35,6 +37,8 @@ const weekDays = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes
 
 export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarProps) {
   const { appointments } = useData();
+  const [selectedAppointment, setSelectedAppointment] = useState<DataAppointment | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
@@ -51,20 +55,14 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
     const formattedDate = format(currentDate, 'yyyy-MM-dd');
     
     // Get appointments for this specific date and time
-    const dayAppointments = appointments.filter(appointment => 
+    return appointments.filter(appointment => 
       appointment.date === formattedDate && appointment.time === time
     );
-    
-    // Convert to the expected format for the calendar
-    return dayAppointments.map(appointment => ({
-      id: appointment.id.toString(),
-      title: appointment.type,
-      time: appointment.time,
-      duration: 1,
-      type: "turnos" as const,
-      patient: appointment.patientName,
-      doctor: "Dr. Sistema",
-    }));
+  };
+
+  const handleAppointmentClick = (appointment: DataAppointment) => {
+    setSelectedAppointment(appointment);
+    setIsDetailsModalOpen(true);
   };
 
   return (
@@ -127,12 +125,12 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
                     {appointments.map((appointment) => (
                       <div
                         key={appointment.id}
-                        className={`dental-appointment-slot appointment-${appointment.type} mb-1 text-xs cursor-pointer`}
+                        className="dental-appointment-slot appointment-turnos mb-1 text-xs cursor-pointer bg-blue-100 border border-blue-300 rounded p-2 hover:bg-blue-200 transition-colors"
+                        onClick={() => handleAppointmentClick(appointment)}
                       >
-                        <div className="font-medium">{appointment.title}</div>
-                        {appointment.patient && (
-                          <div className="text-xs opacity-75">{appointment.patient}</div>
-                        )}
+                        <div className="font-medium">{appointment.type}</div>
+                        <div className="text-xs opacity-75">{appointment.patientName}</div>
+                        <div className="text-xs text-blue-600">{appointment.time}</div>
                       </div>
                     ))}
                   </div>
@@ -142,6 +140,13 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
           ))}
         </div>
       </div>
+      
+      {/* Appointment Details Modal */}
+      <AppointmentDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        appointment={selectedAppointment}
+      />
     </Card>
   );
 }

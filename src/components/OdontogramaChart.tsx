@@ -234,26 +234,26 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
   };
 
   const procedures = [
-    { id: 'diagnostico', name: 'Diagnóstico' },
-    { id: 'limpieza', name: 'Limpieza' },
-    { id: 'obturacion', name: 'Obturación' },
-    { id: 'extraccion', name: 'Extracción' },
-    { id: 'blanqueamiento', name: 'Blanqueamiento' },
-    { id: 'radiografias', name: 'Radiografías' },
-    { id: 'selladores', name: 'Selladores' },
-    { id: 'endodoncia', name: 'Endodoncia' },
-    { id: 'implantes', name: 'Implantes' },
-    { id: 'coronas', name: 'Coronas' },
-    { id: 'puentes', name: 'Puentes' },
-    { id: 'carillas', name: 'Carillas' },
-    { id: 'apicectomia', name: 'Apicectomía' },
-    { id: 'prostodoncia', name: 'Prostodoncia' },
-    { id: 'cirugia', name: 'Cirugía maxilofacial' },
-    { id: 'ortodoncia', name: 'Ortodoncia' },
-    { id: 'placa', name: 'Placa antibruxismo' },
-    { id: 'periodoncia', name: 'Periodoncia' },
-    { id: 'fluor', name: 'Flúor' },
-    { id: 'frenectomia', name: 'Frenectomía' }
+    { id: 'diagnostico', name: 'Diagnóstico', icon: '🔍' },
+    { id: 'limpieza', name: 'Limpieza', icon: '✨' },
+    { id: 'obturacion', name: 'Obturación', icon: '🔧' },
+    { id: 'extraccion', name: 'Extracción', icon: '✂️' },
+    { id: 'blanqueamiento', name: 'Blanqueamiento', icon: '✨' },
+    { id: 'radiografias', name: 'Radiografías', icon: '📸' },
+    { id: 'selladores', name: 'Selladores', icon: '🛡️' },
+    { id: 'endodoncia', name: 'Endodoncia', icon: '⚕️' },
+    { id: 'implantes', name: 'Implantes', icon: '🔩' },
+    { id: 'coronas', name: 'Coronas', icon: '👑' },
+    { id: 'puentes', name: 'Puentes', icon: '🌉' },
+    { id: 'carillas', name: 'Carillas', icon: '💎' },
+    { id: 'apicectomia', name: 'Apicectomía', icon: '🔬' },
+    { id: 'prostodoncia', name: 'Prostodoncia', icon: '🦷' },
+    { id: 'cirugia', name: 'Cirugía maxilofacial', icon: '⚕️' },
+    { id: 'ortodoncia', name: 'Ortodoncia', icon: '🔧' },
+    { id: 'placa', name: 'Placa antibruxismo', icon: '🛡️' },
+    { id: 'periodoncia', name: 'Periodoncia', icon: '🦠' },
+    { id: 'fluor', name: 'Flúor', icon: '💧' },
+    { id: 'frenectomia', name: 'Frenectomía', icon: '✂️' }
   ];
 
   return (
@@ -416,13 +416,15 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
           {procedures.map((procedure) => (
             <div key={procedure.id} className="flex flex-col items-center gap-1 md:gap-2">
               <button
-                className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full border-2 transition-colors ${
+                className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full border-2 transition-colors flex items-center justify-center ${
                   selectedProcedure === procedure.id 
-                    ? 'bg-blue-500 border-blue-600' 
+                    ? 'bg-blue-500 border-blue-600 text-white' 
                     : 'bg-white border-gray-300 hover:border-blue-400'
                 }`}
                 onClick={() => handleProcedureSelect(procedure.id)}
-              />
+              >
+                <span className="text-xs sm:text-sm">{procedure.icon}</span>
+              </button>
               <span className="text-xs text-center font-medium text-gray-700 leading-tight">
                 {procedure.name}
               </span>

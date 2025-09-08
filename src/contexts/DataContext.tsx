@@ -30,6 +30,8 @@ interface DataContextType {
   appointments: Appointment[];
   addPatient: (patient: Omit<Patient, 'id'>) => Patient;
   addAppointment: (appointment: Omit<Appointment, 'id'>) => Appointment;
+  updateAppointment: (id: number, updates: Partial<Appointment>) => void;
+  deleteAppointment: (id: number) => void;
   getPatientByDni: (dni: string) => Patient | undefined;
   getAppointmentsByDate: (date: string) => Appointment[];
 }
@@ -116,6 +118,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return patients.find(patient => patient.dni === dni);
   };
 
+  const updateAppointment = (id: number, updates: Partial<Appointment>) => {
+    setAppointments(prev => 
+      prev.map(appointment => 
+        appointment.id === id ? { ...appointment, ...updates } : appointment
+      )
+    );
+  };
+
+  const deleteAppointment = (id: number) => {
+    setAppointments(prev => prev.filter(appointment => appointment.id !== id));
+  };
+
   const getAppointmentsByDate = (date: string): Appointment[] => {
     return appointments.filter(appointment => appointment.date === date);
   };
@@ -125,6 +139,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     appointments,
     addPatient,
     addAppointment,
+    updateAppointment,
+    deleteAppointment,
     getPatientByDni,
     getAppointmentsByDate,
   };
