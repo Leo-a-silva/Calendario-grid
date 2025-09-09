@@ -17,34 +17,39 @@ export function AppHeader() {
   const formattedDate = today.toLocaleDateString('es-ES', options);
   
   return (
-    <header className="h-16 flex items-center justify-between px-6 bg-[#0f172a] text-white">
+    <header className="h-16 flex items-center justify-between px-6 bg-white border-b border-gray-100 shadow-sm">
       <div className="flex items-center gap-4">
-        <SidebarTrigger className="text-white hover:bg-gray-800 p-2 rounded-lg" />
+        <SidebarTrigger className="text-gray-600 hover:bg-gray-100 p-2 rounded-lg" />
+        <div className="text-sm text-gray-500 hidden md:block">
+          {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+        </div>
       </div>
       
       <div className="flex items-center gap-4">
         <Button 
           variant="ghost" 
           size="icon" 
-          className="text-white hover:bg-gray-800 hover:text-white rounded-full"
+          className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-full relative"
         >
           <Bell className="h-5 w-5" />
+          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-blue-500"></span>
           <span className="sr-only">Notificaciones</span>
         </Button>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-800 cursor-pointer">
-              <Avatar className="h-8 w-8 border-2 border-white">
+            <div className="flex items-center gap-2 p-1 pr-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+              <Avatar className="h-8 w-8 border-2 border-gray-100">
                 <AvatarImage src="/placeholder-user.jpg" alt="Usuario" />
                 <AvatarFallback className="bg-blue-500 text-white">
                   {user?.username?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden md:block">
-                <p className="text-sm font-medium">{user?.username || 'Usuario'}</p>
+                <p className="text-sm font-medium text-gray-800">{user?.username || 'Usuario'}</p>
+                <p className="text-xs text-gray-500">Odontólogo</p>
               </div>
-              <ChevronDown className="h-4 w-4 text-white" />
+              <ChevronDown className="h-4 w-4 text-gray-500" />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end">

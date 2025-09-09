@@ -66,8 +66,8 @@ const Pacientes = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 w-full max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
+    <div className="p-6 space-y-6 w-full max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
             <User className="w-6 h-6 text-primary" />
@@ -109,7 +109,7 @@ const Pacientes = () => {
                   Lista de todos los pacientes en el sistema
                 </CardDescription>
               </div>
-              <div className="relative w-full sm:w-64 md:w-80">
+              <div className="relative w-full md:w-80">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
@@ -123,76 +123,79 @@ const Pacientes = () => {
           </CardHeader>
           <CardContent>
             <div className="rounded-md border">
-              <div className="overflow-x-auto -mx-1 sm:mx-0">
-                <div className="min-w-[320px] sm:min-w-0">
-                  <Table className="w-full">
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px] md:min-w-0">
+                  <Table>
                     <TableHeader className="bg-muted/50">
                       <TableRow>
-                        <TableHead className="w-auto sm:w-[35%] min-w-[200px]">Paciente</TableHead>
-                        <TableHead className="hidden xs:table-cell w-[120px]">DNI</TableHead>
-                        <TableHead className="hidden sm:table-cell w-[180px]">Historia Clínica</TableHead>
-                        <TableHead className="w-[140px] text-center">Acciones</TableHead>
+                        <TableHead className="w-[200px] md:w-[300px]">Paciente</TableHead>
+                        <TableHead className="hidden xs:table-cell">DNI</TableHead>
+                        <TableHead className="hidden sm:table-cell">Historia Clínica</TableHead>
+                        <TableHead className="w-[120px] md:w-[140px] text-center">Acciones</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredPatients.length > 0 ? (
                         filteredPatients.map((patient) => (
                           <TableRow key={patient.id} className="hover:bg-muted/50">
-                            <TableCell className="py-3">
-                              <div className="flex items-center gap-2 sm:gap-3">
-                                <div className="flex-shrink-0 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary/10">
-                                  <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                            <TableCell className="font-medium py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                                  <User className="h-5 w-5 text-primary" />
                                 </div>
                                 <div className="min-w-0">
-                                  <p className="font-medium text-sm sm:text-base truncate">{patient.nombre} {patient.apellido}</p>
+                                  <p className="font-medium truncate">{patient.nombre} {patient.apellido}</p>
                                   <div className="xs:hidden text-xs text-muted-foreground">
                                     DNI: {patient.dni.replace(/(\d{2})(?=\d)/g, '$1.')}
                                   </div>
                                   <div className="sm:hidden text-xs text-muted-foreground truncate">
                                     HC: {patient.numeroHistoriaClinica}
                                   </div>
+                                  <p className="hidden xs:block sm:hidden text-xs text-muted-foreground">
+                                    ID: {patient.id.toString().padStart(4, '0')}
+                                  </p>
                                 </div>
                               </div>
                             </TableCell>
                             <TableCell className="hidden xs:table-cell">
-                              <Badge variant="outline" className="font-mono text-xs sm:text-sm">
+                              <Badge variant="outline" className="font-mono">
                                 {patient.dni.replace(/(\d{2})(?=\d)/g, '$1.')}
                               </Badge>
                             </TableCell>
                             <TableCell className="hidden sm:table-cell">
                               <div className="flex items-center gap-2">
                                 <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                                <span className="font-mono text-sm truncate">{patient.numeroHistoriaClinica}</span>
+                                <span className="font-mono truncate">{patient.numeroHistoriaClinica}</span>
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div className="flex justify-center sm:justify-end gap-1">
+                              <div className="flex justify-center gap-1">
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-primary/10 hover:text-primary"
+                                  className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
                                   onClick={() => navigate(`/odontograma/${patient.id}`)}
                                   title="Ver ficha clínica"
                                 >
-                                  <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                  <Eye className="h-4 w-4" />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-blue-100 hover:text-blue-600"
+                                  className="h-8 w-8 hover:bg-blue-100 hover:text-blue-600"
                                   onClick={() => handleEditPatient(patient)}
                                   title="Editar paciente"
                                 >
-                                  <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                  <Edit className="h-4 w-4" />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-red-100 hover:text-red-600"
+                                  className="h-8 w-8 hover:bg-red-100 hover:text-red-600"
                                   onClick={() => handleDeletePatient(patient)}
                                   title="Eliminar paciente"
                                 >
-                                  <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                  <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
                             </TableCell>
