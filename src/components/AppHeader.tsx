@@ -12,20 +12,21 @@ import {
 
 export function AppHeader() {
   const { user, logout } = useAuth();
+  const today = new Date();
+  const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+  const formattedDate = today.toLocaleDateString('es-ES', options);
+  
   return (
-    <header className="h-16 flex items-center justify-between px-6 bg-blue-600 text-white">
+    <header className="h-16 flex items-center justify-between px-6 bg-[#0f172a] text-white">
       <div className="flex items-center gap-4">
-        <SidebarTrigger className="text-white hover:bg-blue-700 p-2 rounded-lg" />
-        <h1 className="text-xl font-semibold">
-          OdontoApp
-        </h1>
+        <SidebarTrigger className="text-white hover:bg-gray-800 p-2 rounded-lg" />
       </div>
       
       <div className="flex items-center gap-4">
         <Button 
           variant="ghost" 
           size="icon" 
-          className="text-white hover:bg-blue-700 hover:text-white rounded-full"
+          className="text-white hover:bg-gray-800 hover:text-white rounded-full"
         >
           <Bell className="h-5 w-5" />
           <span className="sr-only">Notificaciones</span>
@@ -33,7 +34,7 @@ export function AppHeader() {
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-2 p-1 rounded-full hover:bg-blue-700 cursor-pointer">
+            <div className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-800 cursor-pointer">
               <Avatar className="h-8 w-8 border-2 border-white">
                 <AvatarImage src="/placeholder-user.jpg" alt="Usuario" />
                 <AvatarFallback className="bg-blue-500 text-white">
@@ -57,11 +58,11 @@ export function AppHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
         
-        <div className="h-8 w-px bg-blue-500 mx-2"></div>
+        <div className="h-8 w-px bg-gray-700 mx-2"></div>
         
-        <div className="flex items-center gap-2 bg-white/20 text-white px-3 py-1.5 rounded-lg">
+        <div className="flex items-center gap-2 bg-gray-800 text-white px-3 py-1.5 rounded-lg">
           <CalendarIcon className="h-4 w-4" />
-          <span className="text-sm font-medium">Hoy, 19 Ago</span>
+          <span className="text-sm font-medium">Hoy, {formattedDate}</span>
         </div>
       </div>
     </header>

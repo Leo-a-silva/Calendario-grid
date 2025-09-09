@@ -143,14 +143,6 @@ const Odontograma = () => {
               <span className="hidden sm:inline">Historia Clínica</span>
               <span className="sm:hidden">Historia</span>
             </Button>
-            <Button 
-              className="gap-2 bg-primary hover:bg-primary/90 text-sm"
-              onClick={() => navigate(`/pacientes/${paciente.id}/nuevo-tratamiento`)}
-            >
-              <PlusCircle className="h-4 w-4" />
-              <span className="hidden sm:inline">Nuevo Tratamiento</span>
-              <span className="sm:hidden">Nuevo</span>
-            </Button>
           </div>
         </div>
 

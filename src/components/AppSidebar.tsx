@@ -41,7 +41,7 @@ export function AppSidebar() {
   };
   return <Sidebar className="border-r border-border bg-white w-64">
       <div className="p-4 border-b border-gray-200">
-        <h1 className="text-xl font-bold text-blue-600">OdontoApp</h1>
+        <h1 className="text-xl font-bold text-blue-600">NombreApp</h1>
       </div>
       <SidebarContent className="p-4">
         <SidebarGroup>

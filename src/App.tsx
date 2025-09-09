@@ -10,6 +10,7 @@ import { AppHeader } from "@/components/AppHeader";
 import Index from "./pages/Index";
 import Odontograma from "./pages/Odontograma";
 import Pacientes from "./pages/Pacientes";
+import Agenda from "./pages/Agenda";
 import LoginForm from "./components/LoginForm";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { DataProvider } from "./contexts/DataContext";
@@ -52,6 +53,21 @@ const AppRoutes = () => {
         <ProtectedRoute>
           <AppLayout>
             <Pacientes />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/agenda" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <Agenda />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/agenda/nueva-cita" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <Agenda initialView="newAppointment" />
           </AppLayout>
         </ProtectedRoute>
       } />
