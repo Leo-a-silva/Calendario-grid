@@ -140,7 +140,7 @@ const Index = () => {
             </div>
             <Button 
               variant="outline" 
-              className="border-blue-200 text-blue-700 bg-blue hover:bg-blue-50 hover:border-blue-300 font-medium shadow-sm flex items-center"
+              className="border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-800 font-medium shadow-sm flex items-center transition-colors"
               onClick={() => navigate('/agenda')}
             >
               Ver agenda <ArrowRight className="ml-2 h-4 w-4" />
@@ -179,22 +179,22 @@ const Index = () => {
         </div>
 
         {/* Estadísticas Adicionales */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           {/* Resumen Mensual */}
-          <div className="mt-8 bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Resumen General</h2>
+          <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 shadow-sm">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Resumen General</h2>
               <p className="text-sm text-gray-500">Métricas clave de tu consultorio</p>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
               {additionalStats.map((stat, i) => (
-                <div key={i} className={`${stat.bgColor} rounded-xl p-5 transition-all duration-200`}>
+                <div key={i} className={`${stat.bgColor} rounded-xl p-4 sm:p-5 transition-all duration-200`}>
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
-                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-600 mb-1 truncate">{stat.title}</p>
+                      <p className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</p>
                     </div>
-                    <div className={`p-2 rounded-lg ${stat.bgColor.replace('50', '100')}`}>
+                    <div className={`p-2 rounded-lg ${stat.bgColor.replace('50', '100')} flex-shrink-0 ml-2`}>
                       {typeof stat.icon === 'string' ? (
                         <span className={`text-lg font-bold ${stat.iconColor}`}>{stat.icon}</span>
                       ) : (

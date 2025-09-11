@@ -38,7 +38,7 @@ export function AppHeader() {
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-2 p-1 pr-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+            <div className="flex items-center gap-2 p-1 pr-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors group">
               <Avatar className="h-8 w-8 border-2 border-gray-100">
                 <AvatarImage src="/placeholder-user.jpg" alt="Usuario" />
                 <AvatarFallback className="bg-blue-500 text-white">
@@ -46,10 +46,10 @@ export function AppHeader() {
                 </AvatarFallback>
               </Avatar>
               <div className="hidden md:block">
-                <p className="text-sm font-medium text-gray-800">{user?.username || 'Usuario'}</p>
-                <p className="text-xs text-gray-500">Odontólogo</p>
+                <p className="text-sm font-medium text-gray-800 group-hover:text-gray-900">{user?.username || 'Usuario'}</p>
+                <p className="text-xs text-gray-500 group-hover:text-gray-600">Odontólogo</p>
               </div>
-              <ChevronDown className="h-4 w-4 text-gray-500" />
+              <ChevronDown className="h-4 w-4 text-gray-500 group-hover:text-gray-600" />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end">
