@@ -3,88 +3,124 @@ import { CalendarDays, Clock, User, Stethoscope, Calendar as CalendarIcon, Arrow
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AddPatientModal } from "@/components/AddPatientModal";
+import { useData } from "@/contexts/DataContext";
 
 const Index = () => {
   const navigate = useNavigate();
   const [isAddPatientModalOpen, setIsAddPatientModalOpen] = useState(false);
+  const { patients, appointments } = useData();
   
-  // Datos de ejemplo para las estadísticas
-  const stats = [
-    { 
-      title: "Citas Hoy", 
-      value: "8", 
-      icon: CalendarDays, 
-      trend: "+2",
-      description: "Citas programadas para hoy",
-      bgColor: "bg-blue-50",
-      iconColor: "text-blue-600",
-      valueColor: "text-blue-900"
-    },
-    { 
-      title: "Próxima Cita", 
-      value: "10:30 AM", 
-      icon: Clock, 
-      trend: "",
-      description: "Siguiente cita programada",
-      bgColor: "bg-emerald-50",
-      iconColor: "text-emerald-600",
-      valueColor: "text-emerald-900"
-    },
-    { 
-      title: "Nuevos Pacientes", 
-      value: "3", 
-      icon: User, 
-      trend: "+1",
-      description: "Nuevos pacientes este mes",
-      bgColor: "bg-amber-50",
-      iconColor: "text-amber-600",
-      valueColor: "text-amber-900"
-    },
-    { 
-      title: "Tratamientos Activos", 
-      value: "5", 
-      icon: Stethoscope, 
-      trend: "",
-      description: "Tratamientos en curso",
-      bgColor: "bg-purple-50",
-      iconColor: "text-purple-600",
-      valueColor: "text-purple-900"
-    },
-  ];
+  // Calcular estadísticas reales
+  const stats = useMemo(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const todayAppointments = appointments.filter(apt => apt.date === today);
+    
+    // Próxima cita de hoy
+    const nextAppointment = todayAppointments
+      .filter(apt => apt.status === 'scheduled')
+      .sort((a, b) => a.time.localeCompare(b.time))[0];
+    
+    // Nuevos pacientes este mes
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const newPatientsThisMonth = patients.filter(patient => {
+      if (!patient.fechaNacimiento) return false;
+      const patientDate = new Date(patient.fechaNacimiento);
+      return patientDate.getMonth() === currentMonth && patientDate.getFullYear() === currentYear;
+    }).length;
+    
+    // Tratamientos activos (citas programadas)
+    const activeTreatments = appointments.filter(apt => apt.status === 'scheduled').length;
+    
+    return [
+      { 
+        title: "Citas Hoy", 
+        value: todayAppointments.length.toString(), 
+        icon: CalendarDays, 
+        trend: todayAppointments.length > 0 ? `+${todayAppointments.length}` : "",
+        description: "Citas programadas para hoy",
+        bgColor: "bg-blue-50",
+        iconColor: "text-blue-600",
+        valueColor: "text-blue-900"
+      },
+      { 
+        title: "Próxima Cita", 
+        value: nextAppointment ? nextAppointment.time : "Sin citas", 
+        icon: Clock, 
+        trend: "",
+        description: "Siguiente cita programada",
+        bgColor: "bg-emerald-50",
+        iconColor: "text-emerald-600",
+        valueColor: "text-emerald-900"
+      },
+      { 
+        title: "Nuevos Pacientes", 
+        value: newPatientsThisMonth.toString(), 
+        icon: User, 
+        trend: newPatientsThisMonth > 0 ? `+${newPatientsThisMonth}` : "",
+        description: "Nuevos pacientes este mes",
+        bgColor: "bg-amber-50",
+        iconColor: "text-amber-600",
+        valueColor: "text-amber-900"
+      },
+      { 
+        title: "Tratamientos Activos", 
+        value: activeTreatments.toString(), 
+        icon: Stethoscope, 
+        trend: "",
+        description: "Tratamientos en curso",
+        bgColor: "bg-purple-50",
+        iconColor: "text-purple-600",
+        valueColor: "text-purple-900"
+      },
+    ];
+  }, [patients, appointments]);
 
-  // Estadísticas adicionales
-  const additionalStats = [
-    { 
-      title: "Pacientes Totales", 
-      value: "124", 
-      icon: User,
-      bgColor: "bg-sky-50",
-      iconColor: "text-sky-600"
-    },
-    { 
-      title: "Citas del Mes", 
-      value: "68", 
-      icon: CalendarIcon,
-      bgColor: "bg-rose-50",
-      iconColor: "text-rose-600"
-    },
-    { 
-      title: "Ingresos Mensuales", 
-      value: "$12,450", 
-      icon: "$",
-      bgColor: "bg-green-50",
-      iconColor: "text-green-600"
-    },
-    { 
-      title: "Procedimientos Realizados", 
-      value: "42", 
-      icon: Stethoscope,
-      bgColor: "bg-indigo-50",
-      iconColor: "text-indigo-600"
-    },
-  ];
+  // Estadísticas adicionales calculadas
+  const additionalStats = useMemo(() => {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    const appointmentsThisMonth = appointments.filter(apt => {
+      const aptDate = new Date(apt.date);
+      return aptDate.getMonth() === currentMonth && aptDate.getFullYear() === currentYear;
+    }).length;
+    
+    const completedAppointments = appointments.filter(apt => apt.status === 'completed').length;
+    
+    return [
+      { 
+        title: "Pacientes Totales", 
+        value: patients.length.toString(), 
+        icon: User,
+        bgColor: "bg-sky-50",
+        iconColor: "text-sky-600"
+      },
+      { 
+        title: "Citas del Mes", 
+        value: appointmentsThisMonth.toString(), 
+        icon: CalendarIcon,
+        bgColor: "bg-rose-50",
+        iconColor: "text-rose-600"
+      },
+      { 
+        title: "Ingresos Mensuales", 
+        value: `$${(appointmentsThisMonth * 150).toLocaleString()}`, 
+        icon: "$",
+        bgColor: "bg-green-50",
+        iconColor: "text-green-600"
+      },
+      { 
+        title: "Tratamientos Completados", 
+        value: completedAppointments.toString(), 
+        icon: Stethoscope,
+        bgColor: "bg-indigo-50",
+        iconColor: "text-indigo-600"
+      },
+    ];
+  }, [patients, appointments]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">

@@ -67,7 +67,7 @@ const AppRoutes = () => {
       <Route path="/agenda/nueva-cita" element={
         <ProtectedRoute>
           <AppLayout>
-            <Agenda initialView="newAppointment" />
+            <Agenda />
           </AppLayout>
         </ProtectedRoute>
       } />
