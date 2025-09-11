@@ -2,6 +2,7 @@ import { Bell, Calendar as CalendarIcon, ChevronDown, LogOut } from "lucide-reac
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SpecialtySelector } from "@/components/SpecialtySelector";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
@@ -26,6 +27,8 @@ export function AppHeader() {
       </div>
       
       <div className="flex items-center gap-4">
+        <SpecialtySelector />
+        
         <Button 
           variant="ghost" 
           size="icon" 
@@ -47,7 +50,7 @@ export function AppHeader() {
               </Avatar>
               <div className="hidden md:block">
                 <p className="text-sm font-medium text-gray-800 group-hover:text-gray-900">{user?.username || 'Usuario'}</p>
-                <p className="text-xs text-gray-500 group-hover:text-gray-600">Odontólogo</p>
+                <p className="text-xs text-gray-500 group-hover:text-gray-600">{user?.specialty || 'Profesional de la Salud'}</p>
               </div>
               <ChevronDown className="h-4 w-4 text-gray-500 group-hover:text-gray-600" />
             </div>

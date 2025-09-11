@@ -11,6 +11,13 @@ export interface Patient {
   fechaNacimiento?: string;
   direccion?: string;
   sexo?: string;
+  alergias?: string;
+  medicamentosActuales?: string;
+  antecedentesPersonales?: string;
+  antecedentesFamiliares?: string;
+  ocupacion?: string;
+  contactoEmergencia?: string;
+  obraSocial?: string;
 }
 
 export interface Appointment {

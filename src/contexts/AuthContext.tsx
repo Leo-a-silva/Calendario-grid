@@ -1,14 +1,19 @@
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 
-interface User {
+export interface User {
+  id?: number;
   username: string;
-  // Add other user properties as needed
+  email?: string;
+  specialty?: string;
+  professionalLicense?: string;
+  clinicName?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
+  updateUser: (updates: Partial<User>) => void;
   isAuthenticated: boolean;
   loading: boolean;
 }
@@ -55,12 +60,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('user');
   };
 
+  const updateUser = (updates: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...updates };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+  };
+
   return (
     <AuthContext.Provider 
       value={{
         user,
         login,
         logout,
+        updateUser,
         isAuthenticated: !!user,
         loading
       }}

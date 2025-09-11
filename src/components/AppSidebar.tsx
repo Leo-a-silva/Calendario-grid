@@ -15,9 +15,9 @@ const items = [{
   url: "/agenda",
   icon: Calendar
 }, {
-  title: "Documentos",
-  url: "/documentos",
-  icon: File
+  title: "Historial Médico",
+  url: "/historial",
+  icon: FileText
 }, {
   title: "Mensajes",
   url: "/mensajes",
@@ -41,7 +41,7 @@ export function AppSidebar() {
   };
   return <Sidebar className="border-r border-gray-100 bg-white w-64 shadow-sm">
       <div className="p-4 border-b border-gray-100">
-        <h1 className="text-xl font-bold text-white-600">NombreApp</h1>
+        <h1 className="text-xl font-bold text-gray-600">MediConsult</h1>
       </div>
       <SidebarContent className="p-4">
         <SidebarGroup>
