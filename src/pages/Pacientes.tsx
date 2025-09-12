@@ -174,8 +174,8 @@ const Pacientes = () => {
                                   variant="ghost"
                                   size="icon"
                                   className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
-                                  onClick={() => navigate(`/odontograma/${patient.id}`)}
-                                  title="Ver ficha clínica"
+                                  onClick={() => navigate(`/pacientes/${patient.id}`)}
+                                  title="Ver historial médico"
                                 >
                                   <Eye className="h-4 w-4" />
                                 </Button>

@@ -10,10 +10,12 @@ import { AppHeader } from "@/components/AppHeader";
 import Index from "./pages/Index";
 import Odontograma from "./pages/Odontograma";
 import Pacientes from "./pages/Pacientes";
+import PatientDetail from "./pages/PatientDetail";
 import Agenda from "./pages/Agenda";
 import LoginForm from "./components/LoginForm";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { DataProvider } from "./contexts/DataContext";
+import { MedicalProvider } from "./contexts/MedicalContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -53,6 +55,14 @@ const AppRoutes = () => {
         <ProtectedRoute>
           <AppLayout>
             <Pacientes />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/pacientes/:id" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <PatientDetail />
           </AppLayout>
         </ProtectedRoute>
       } />
@@ -100,11 +110,13 @@ const App = () => (
       <Sonner />
       <AuthProvider>
         <DataProvider>
-          <Router>
-            <SidebarProvider>
-              <AppRoutes />
-            </SidebarProvider>
-          </Router>
+          <MedicalProvider>
+            <Router>
+              <SidebarProvider>
+                <AppRoutes />
+              </SidebarProvider>
+            </Router>
+          </MedicalProvider>
         </DataProvider>
       </AuthProvider>
     </TooltipProvider>
