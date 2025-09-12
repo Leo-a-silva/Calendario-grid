@@ -1,28 +1,42 @@
-import { Home, Users, FileText, Calendar, File, Settings, MessageSquare, Bell, User, LogOut } from "lucide-react";
+import { Home, Users, FileText, Calendar, File, Settings, MessageSquare, Bell, User, LogOut, Smile } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 
-const items = [{
-  title: "Inicio",
-  url: "/",
-  icon: Home
-}, {
-  title: "Pacientes",
-  url: "/pacientes",
-  icon: Users
-}, {
-  title: "Agenda",
-  url: "/agenda",
-  icon: Calendar
-}, {
-  title: "Historial Médico",
-  url: "/historial",
-  icon: FileText
-}, {
-  title: "Mensajes",
-  url: "/mensajes",
-  icon: MessageSquare
-}];
+const getMenuItems = (userSpecialty?: string) => {
+  const baseItems = [{
+    title: "Inicio",
+    url: "/",
+    icon: Home
+  }, {
+    title: "Pacientes",
+    url: "/pacientes",
+    icon: Users
+  }, {
+    title: "Agenda",
+    url: "/agenda",
+    icon: Calendar
+  }, {
+    title: "Historial Médico",
+    url: "/historial",
+    icon: FileText
+  }, {
+    title: "Mensajes",
+    url: "/mensajes",
+    icon: MessageSquare
+  }];
+
+  // Add Odontograma only for dentists
+  if (userSpecialty?.toLowerCase().includes('odont') || userSpecialty?.toLowerCase().includes('dent')) {
+    baseItems.splice(3, 0, {
+      title: "Odontograma",
+      url: "/odontograma",
+      icon: Smile
+    });
+  }
+
+  return baseItems;
+};
 
 const configItems = [{
   title: "Configuración",
@@ -31,6 +45,7 @@ const configItems = [{
 }];
 
 export function AppSidebar() {
+  const { user } = useAuth();
   const location = useLocation();
   const currentPath = location.pathname;
   const isActive = (path: string) => {
@@ -50,7 +65,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent className="mb-6">
             <SidebarMenu>
-              {items.map(item => (
+              {getMenuItems(user?.specialty).map(item => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink 
@@ -108,8 +123,8 @@ export function AppSidebar() {
               <User className="w-4 h-4 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-black-800">Dr. Juan Pérez</p>
-              <p className="text-xs text-dark-500">Odontólogo</p>
+              <p className="text-sm font-medium text-black-800">{user?.username || 'Dr. Juan Pérez'}</p>
+              <p className="text-xs text-dark-500">{user?.specialty || 'Profesional de la Salud'}</p>
             </div>
           </div>
           <button className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">

@@ -5,14 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Plus, Calendar, FileText, Pill, Activity } from 'lucide-react';
+import { ArrowLeft, Plus, Calendar, FileText, Pill, Activity, Smile } from 'lucide-react';
 import { useData, Patient } from '@/contexts/DataContext';
 import { useMedical, MedicalRecord } from '@/contexts/MedicalContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { MedicalRecordModal } from '@/components/MedicalRecordModal';
+import { OdontogramaChart } from '@/components/OdontogramaChart';
 
 const PatientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { patients } = useData();
   const { getPatientMedicalHistory, getPatientPrescriptions } = useMedical();
   const [patient, setPatient] = useState<Patient | null>(null);
@@ -60,6 +63,9 @@ const PatientDetail = () => {
     return labels[type];
   };
 
+  const isDentist = user?.specialty?.toLowerCase().includes('odont') || user?.specialty?.toLowerCase().includes('dent');
+  const tabsCount = isDentist ? 4 : 3;
+
   return (
     <div className="container mx-auto p-6 max-w-6xl">
       {/* Header */}
@@ -77,9 +83,10 @@ const PatientDetail = () => {
       </div>
 
       <Tabs defaultValue="info" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className={`grid w-full grid-cols-${tabsCount}`}>
           <TabsTrigger value="info">Información Personal</TabsTrigger>
           <TabsTrigger value="history">Historial Médico</TabsTrigger>
+          {isDentist && <TabsTrigger value="odontogram">Odontograma</TabsTrigger>}
           <TabsTrigger value="appointments">Citas</TabsTrigger>
         </TabsList>
 
@@ -250,6 +257,19 @@ const PatientDetail = () => {
             )}
           </div>
         </TabsContent>
+
+        {isDentist && (
+          <TabsContent value="odontogram" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Odontograma</h2>
+            </div>
+            <Card>
+              <CardContent className="p-6">
+                <OdontogramaChart denticionType="permanente" pacienteId={patient.id} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
 
         <TabsContent value="appointments">
           <Card>
