@@ -2,11 +2,10 @@ import { Bell, Calendar as CalendarIcon, ChevronDown, LogOut } from "lucide-reac
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SpecialtySelector } from "@/components/SpecialtySelector";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
-  DropdownMenuContent,
+  DropdownMenuContent,  
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -27,8 +26,6 @@ export function AppHeader() {
       </div>
       
       <div className="flex items-center gap-4">
-        <SpecialtySelector />
-        
         <Button 
           variant="ghost" 
           size="icon" 

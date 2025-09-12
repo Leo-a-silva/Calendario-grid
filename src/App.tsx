@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Odontograma from "./pages/Odontograma";
 import Pacientes from "./pages/Pacientes";
 import PatientDetail from "./pages/PatientDetail";
+import Configuracion from "./pages/Configuracion";
 import Agenda from "./pages/Agenda";
 import LoginForm from "./components/LoginForm";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
@@ -63,6 +64,14 @@ const AppRoutes = () => {
         <ProtectedRoute>
           <AppLayout>
             <PatientDetail />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/configuracion" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <Configuracion />
           </AppLayout>
         </ProtectedRoute>
       } />
