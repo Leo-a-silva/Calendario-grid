@@ -121,120 +121,118 @@ const Pacientes = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
+          <CardContent className="p-0">
+            <div className="rounded-md border overflow-hidden">
               <div className="overflow-x-auto">
-                <div className="min-w-[600px] md:min-w-0">
-                  <Table>
-                    <TableHeader className="bg-muted/50">
-                      <TableRow>
-                        <TableHead className="w-[200px] md:w-[300px]">Paciente</TableHead>
-                        <TableHead className="hidden xs:table-cell">DNI</TableHead>
-                        <TableHead className="hidden sm:table-cell">Historia Clínica</TableHead>
-                        <TableHead className="w-[120px] md:w-[140px] text-center">Acciones</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredPatients.length > 0 ? (
-                        filteredPatients.map((patient) => (
-                          <TableRow key={patient.id} className="hover:bg-muted/50">
-                            <TableCell className="font-medium py-3">
-                              <div className="flex items-center gap-3">
-                                <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                                  <User className="h-5 w-5 text-primary" />
+                <Table className="min-w-full">
+                  <TableHeader className="bg-muted/50">
+                    <TableRow>
+                      <TableHead className="w-[200px] md:w-[300px]">Paciente</TableHead>
+                      <TableHead className="hidden xs:table-cell">DNI</TableHead>
+                      <TableHead className="hidden sm:table-cell">Historia Clínica</TableHead>
+                      <TableHead className="w-[120px] md:w-[140px] text-center">Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredPatients.length > 0 ? (
+                      filteredPatients.map((patient) => (
+                        <TableRow key={patient.id} className="hover:bg-muted/50">
+                          <TableCell className="font-medium py-3">
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                                <User className="h-5 w-5 text-primary" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-medium truncate">{patient.nombre} {patient.apellido}</p>
+                                <div className="xs:hidden text-xs text-muted-foreground">
+                                  DNI: {patient.dni.replace(/(\d{2})(?=\d)/g, '$1.')}
                                 </div>
-                                <div className="min-w-0">
-                                  <p className="font-medium truncate">{patient.nombre} {patient.apellido}</p>
-                                  <div className="xs:hidden text-xs text-muted-foreground">
-                                    DNI: {patient.dni.replace(/(\d{2})(?=\d)/g, '$1.')}
-                                  </div>
-                                  <div className="sm:hidden text-xs text-muted-foreground truncate">
-                                    HC: {patient.numeroHistoriaClinica}
-                                  </div>
-                                  <p className="hidden xs:block sm:hidden text-xs text-muted-foreground">
-                                    ID: {patient.id.toString().padStart(4, '0')}
-                                  </p>
+                                <div className="sm:hidden text-xs text-muted-foreground truncate">
+                                  HC: {patient.numeroHistoriaClinica}
                                 </div>
+                                <p className="hidden xs:block sm:hidden text-xs text-muted-foreground">
+                                  ID: {patient.id.toString().padStart(4, '0')}
+                                </p>
                               </div>
-                            </TableCell>
-                            <TableCell className="hidden xs:table-cell">
-                              <Badge variant="outline" className="font-mono">
-                                {patient.dni.replace(/(\d{2})(?=\d)/g, '$1.')}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="hidden sm:table-cell">
-                              <div className="flex items-center gap-2">
-                                <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                                <span className="font-mono truncate">{patient.numeroHistoriaClinica}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
-                                  onClick={() => navigate(`/pacientes/${patient.id}`)}
-                                  title="Ver historial médico"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 hover:bg-blue-100 hover:text-blue-600"
-                                  onClick={() => handleEditPatient(patient)}
-                                  title="Editar paciente"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 hover:bg-red-100 hover:text-red-600"
-                                  onClick={() => handleDeletePatient(patient)}
-                                  title="Eliminar paciente"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={4} className="h-24 text-center">
-                            {searchTerm ? (
-                              <div className="flex flex-col items-center justify-center py-6">
-                                <Search className="h-8 w-8 text-muted-foreground mb-2" />
-                                <p className="text-muted-foreground">No se encontraron pacientes que coincidan con la búsqueda</p>
-                                <Button 
-                                  variant="ghost" 
-                                  className="mt-2"
-                                  onClick={() => setSearchTerm('')}
-                                >
-                                  Limpiar búsqueda
-                                </Button>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center justify-center py-6">
-                                <User className="h-8 w-8 text-muted-foreground mb-2" />
-                                <p className="text-muted-foreground">No hay pacientes registrados</p>
-                                <Button 
-                                  className="mt-2"
-                                  onClick={() => setAddPatientModalOpen(true)}
-                                >
-                                  <Plus className="h-4 w-4 mr-2" />
-                                  Agregar paciente
-                                </Button>
-                              </div>
-                            )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="hidden xs:table-cell">
+                            <Badge variant="outline" className="font-mono">
+                              {patient.dni.replace(/(\d{2})(?=\d)/g, '$1.')}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="hidden sm:table-cell">
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                              <span className="font-mono truncate">{patient.numeroHistoriaClinica}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex justify-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                                onClick={() => navigate(`/pacientes/${patient.id}`)}
+                                title="Ver historial médico"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-blue-100 hover:text-blue-600"
+                                onClick={() => handleEditPatient(patient)}
+                                title="Editar paciente"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-red-100 hover:text-red-600"
+                                onClick={() => handleDeletePatient(patient)}
+                                title="Eliminar paciente"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="h-24 text-center">
+                          {searchTerm ? (
+                            <div className="flex flex-col items-center justify-center py-6">
+                              <Search className="h-8 w-8 text-muted-foreground mb-2" />
+                              <p className="text-muted-foreground">No se encontraron pacientes que coincidan con la búsqueda</p>
+                              <Button 
+                                variant="ghost" 
+                                className="mt-2"
+                                onClick={() => setSearchTerm('')}
+                              >
+                                Limpiar búsqueda
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center py-6">
+                              <User className="h-8 w-8 text-muted-foreground mb-2" />
+                              <p className="text-muted-foreground">No hay pacientes registrados</p>
+                              <Button 
+                                className="mt-2"
+                                onClick={() => setAddPatientModalOpen(true)}
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Agregar paciente
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
               </div>
             </div>
           </CardContent>
