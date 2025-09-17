@@ -168,11 +168,13 @@ interface AppointmentFormData {
 interface AppointmentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialDate?: Date;
+  initialTime?: string;
 }
 
 type ModalStep = 'dni-search' | 'patient-form' | 'appointment-form';
 
-export function AppointmentModal({ open, onOpenChange }: AppointmentModalProps) {
+export function AppointmentModal({ open, onOpenChange, initialDate, initialTime }: AppointmentModalProps) {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
   const { getPatientByDni, addPatient, addAppointment } = useData();
@@ -203,6 +205,17 @@ export function AppointmentModal({ open, onOpenChange }: AppointmentModalProps) 
       setFoundPatient(null);
       setPatientNotFound(false);
       form.reset();
+    } else {
+      // Set initial date and time if provided
+      if (initialDate) {
+        form.setValue('fecha', initialDate);
+      }
+      if (initialTime) {
+        const [hours, minutes] = initialTime.split(':');
+        const timeDate = new Date();
+        timeDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        form.setValue('hora', timeDate);
+      }
     }
     onOpenChange(openState);
   };

@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function Agenda() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
+  const [modalInitialDate, setModalInitialDate] = useState<Date | undefined>();
+  const [modalInitialTime, setModalInitialTime] = useState<string | undefined>();
 
   // Próximas citas de ejemplo
   const upcomingAppointments = [
@@ -18,6 +20,18 @@ export default function Agenda() {
     { id: 4, time: "02:00 PM", patient: "Juan Pérez", procedure: "Blanqueamiento" },
     { id: 5, time: "03:30 PM", patient: "Laura Sánchez", procedure: "Revisión" },
   ];
+
+  const handleTimeSlotClick = (date: Date, time: string) => {
+    setModalInitialDate(date);
+    setModalInitialTime(time);
+    setAppointmentModalOpen(true);
+  };
+
+  const handleNewAppointmentClick = () => {
+    setModalInitialDate(undefined);
+    setModalInitialTime(undefined);
+    setAppointmentModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
@@ -29,7 +43,7 @@ export default function Agenda() {
             <p className="text-gray-600">Gestiona tus citas y horarios</p>
           </div>
           <Button 
-            onClick={() => setAppointmentModalOpen(true)}
+            onClick={handleNewAppointmentClick}
             className="bg-primary hover:bg-primary/90"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -106,7 +120,8 @@ export default function Agenda() {
               <CardContent>
                 <WeeklyCalendar 
                   selectedDate={selectedDate} 
-                  onDateChange={setSelectedDate} 
+                  onDateChange={setSelectedDate}
+                  onTimeSlotClick={handleTimeSlotClick}
                 />
               </CardContent>
             </Card>
@@ -118,6 +133,8 @@ export default function Agenda() {
       <AppointmentModal 
         open={appointmentModalOpen}
         onOpenChange={setAppointmentModalOpen}
+        initialDate={modalInitialDate}
+        initialTime={modalInitialTime}
       />
     </div>
   );

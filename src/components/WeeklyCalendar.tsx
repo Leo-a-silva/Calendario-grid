@@ -21,6 +21,7 @@ interface Appointment {
 interface WeeklyCalendarProps {
   selectedDate: Date;
   onDateChange: (date: Date) => void;
+  onTimeSlotClick?: (date: Date, time: string) => void;
 }
 
 const sampleAppointments: Appointment[] = [
@@ -35,7 +36,7 @@ const timeSlots = Array.from({ length: 12 }, (_, i) => {
 
 const weekDays = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
-export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ selectedDate, onDateChange, onTimeSlotClick }: WeeklyCalendarProps) {
   const { appointments } = useData();
   const [selectedAppointment, setSelectedAppointment] = useState<DataAppointment | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -120,13 +121,21 @@ export function WeeklyCalendar({ selectedDate, onDateChange }: WeeklyCalendarPro
                 return (
                   <div 
                     key={`${dayIndex}-${time}`} 
-                    className="min-h-12 p-1 border-l border-b hover:bg-gray-50"
+                    className="min-h-12 p-1 border-l border-b hover:bg-gray-50 cursor-pointer"
+                    onClick={() => {
+                      if (appointments.length === 0 && onTimeSlotClick) {
+                        onTimeSlotClick(date, time);
+                      }
+                    }}
                   >
                     {appointments.map((appointment) => (
                       <div
                         key={appointment.id}
                         className="dental-appointment-slot appointment-turnos mb-1 text-xs cursor-pointer bg-blue-100 border border-blue-300 rounded p-2 hover:bg-blue-200 transition-colors"
-                        onClick={() => handleAppointmentClick(appointment)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAppointmentClick(appointment);
+                        }}
                       >
                         <div className="font-medium">{appointment.type}</div>
                         <div className="text-xs opacity-75">{appointment.patientName}</div>
