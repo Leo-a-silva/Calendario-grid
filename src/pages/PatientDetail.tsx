@@ -5,33 +5,59 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Plus, Calendar, FileText, Pill, Activity, Smile } from 'lucide-react';
+import { ArrowLeft, Plus, Calendar, FileText, Pill, Activity, Smile, Edit, Trash2 } from 'lucide-react';
 import { useData, Patient } from '@/contexts/DataContext';
 import { useMedical, MedicalRecord } from '@/contexts/MedicalContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { MedicalRecordModal } from '@/components/MedicalRecordModal';
 import { OdontogramaChart } from '@/components/OdontogramaChart';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 const PatientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { patients } = useData();
-  const { getPatientMedicalHistory, getPatientPrescriptions } = useMedical();
+  const { getPatientMedicalHistory, deleteMedicalRecord } = useMedical();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([]);
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<MedicalRecord | undefined>(undefined);
 
   useEffect(() => {
     if (id) {
       const foundPatient = patients.find(p => p.id === parseInt(id));
       if (foundPatient) {
         setPatient(foundPatient);
-        const records = getPatientMedicalHistory(foundPatient.id);
-        setMedicalRecords(records.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+        refreshMedicalRecords(foundPatient.id);
       }
     }
   }, [id, patients, getPatientMedicalHistory]);
+
+  const refreshMedicalRecords = (patientId: number) => {
+    const records = getPatientMedicalHistory(patientId);
+    setMedicalRecords(records.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+  };
+
+  const handleEditRecord = (record: MedicalRecord) => {
+    setEditingRecord(record);
+    setIsRecordModalOpen(true);
+  };
+
+  const handleDeleteRecord = (recordId: number) => {
+    deleteMedicalRecord(recordId);
+    if (patient) {
+      refreshMedicalRecords(patient.id);
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsRecordModalOpen(false);
+    setEditingRecord(undefined);
+    if (patient) {
+      refreshMedicalRecords(patient.id);
+    }
+  };
 
   if (!patient) {
     return (
@@ -202,7 +228,44 @@ const PatientDetail = () => {
                           {new Date(record.date).toLocaleDateString('es-ES')}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-400">por {record.createdBy}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-400">por {record.createdBy}</span>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditRecord(record)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>¿Eliminar registro médico?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Esta acción no se puede deshacer. Se eliminará permanentemente este registro médico.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteRecord(record.id)}>
+                                  Eliminar
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
                     </div>
                     
                     <h3 className="font-medium text-gray-900 mb-2">{record.title}</h3>
@@ -285,9 +348,10 @@ const PatientDetail = () => {
 
       <MedicalRecordModal
         isOpen={isRecordModalOpen}
-        onClose={() => setIsRecordModalOpen(false)}
+        onClose={handleModalClose}
         patientId={patient.id}
         patientName={`${patient.nombre} ${patient.apellido}`}
+        editingRecord={editingRecord}
       />
     </div>
   );

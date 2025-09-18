@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -15,10 +15,11 @@ interface MedicalRecordModalProps {
   onClose: () => void;
   patientId: number;
   patientName: string;
+  editingRecord?: MedicalRecord;
 }
 
-export const MedicalRecordModal = ({ isOpen, onClose, patientId, patientName }: MedicalRecordModalProps) => {
-  const { addMedicalRecord } = useMedical();
+export const MedicalRecordModal = ({ isOpen, onClose, patientId, patientName, editingRecord }: MedicalRecordModalProps) => {
+  const { addMedicalRecord, updateMedicalRecord } = useMedical();
   const { user } = useAuth();
   const [recordType, setRecordType] = useState<MedicalRecord['type']>('consultation');
   const [title, setTitle] = useState('');
@@ -31,6 +32,21 @@ export const MedicalRecordModal = ({ isOpen, onClose, patientId, patientName }: 
   
   // Medications
   const [medications, setMedications] = useState<Medication[]>([]);
+
+  // Load data when editing
+  useEffect(() => {
+    if (editingRecord && isOpen) {
+      setRecordType(editingRecord.type);
+      setTitle(editingRecord.title);
+      setDescription(editingRecord.description);
+      setDiagnosis(editingRecord.diagnosis || '');
+      setNotes(editingRecord.notes || '');
+      setVitalSigns(editingRecord.vitalSigns || {});
+      setMedications(editingRecord.medications || []);
+    } else if (isOpen && !editingRecord) {
+      resetForm();
+    }
+  }, [editingRecord, isOpen]);
 
   const addMedication = () => {
     const newMedication: Medication = {
@@ -69,9 +85,9 @@ export const MedicalRecordModal = ({ isOpen, onClose, patientId, patientName }: 
   const handleSave = () => {
     if (!title.trim() || !description.trim()) return;
 
-    const newRecord: Omit<MedicalRecord, 'id'> = {
+    const recordData = {
       patientId,
-      date: new Date().toISOString(),
+      date: editingRecord?.date || new Date().toISOString(),
       type: recordType,
       title: title.trim(),
       description: description.trim(),
@@ -79,10 +95,15 @@ export const MedicalRecordModal = ({ isOpen, onClose, patientId, patientName }: 
       notes: notes.trim() || undefined,
       medications: medications.length > 0 ? medications : undefined,
       vitalSigns: Object.keys(vitalSigns).length > 0 ? vitalSigns : undefined,
-      createdBy: user?.username || 'Usuario'
+      createdBy: editingRecord?.createdBy || user?.username || 'Usuario'
     };
 
-    addMedicalRecord(newRecord);
+    if (editingRecord) {
+      updateMedicalRecord(editingRecord.id, recordData);
+    } else {
+      addMedicalRecord(recordData);
+    }
+    
     resetForm();
     onClose();
   };
@@ -102,7 +123,9 @@ export const MedicalRecordModal = ({ isOpen, onClose, patientId, patientName }: 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nuevo Registro Médico - {patientName}</DialogTitle>
+          <DialogTitle>
+            {editingRecord ? 'Editar Registro Médico' : 'Nuevo Registro Médico'} - {patientName}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -303,7 +326,7 @@ export const MedicalRecordModal = ({ isOpen, onClose, patientId, patientName }: 
               Cancelar
             </Button>
             <Button onClick={handleSave} className="flex-1" disabled={!title.trim() || !description.trim()}>
-              Guardar Registro
+              {editingRecord ? 'Actualizar Registro' : 'Guardar Registro'}
             </Button>
           </div>
         </div>
