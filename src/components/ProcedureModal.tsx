@@ -55,6 +55,19 @@ export function ProcedureModal({ isOpen, onClose, toothNumber, onProcedureSelect
     { id: 'protesis', name: 'Prótesis', icon: <Smile className="h-6 w-6" /> }
   ];
 
+  // Si existe un icono en public/Iconos tratamientos, úsalo
+  const iconMap: Record<string, string> = {
+    diagnostico: "diagnosticos.svg",
+    limpieza: "limpieza.svg",
+    obturacion: "obstruccion.svg",
+    extraccion: "extraccion.svg",
+    endodoncia: "endodoncia.svg",
+    corona: "coronas.svg",
+    cirugia: "cirugia_maxilofacial.svg",
+    implante: "implantes.svg",
+    radiografia: "radiografia.svg",
+  };
+
   const handleTaskToggle = (task: string) => {
     setSelectedTasks(prev => 
       prev.includes(task) 
@@ -108,7 +121,17 @@ export function ProcedureModal({ isOpen, onClose, toothNumber, onProcedureSelect
                   className="flex flex-col items-center gap-2 h-20 bg-white hover:bg-blue-100 border-blue-200"
                   onClick={() => handleProcedureClick(procedure.id)}
                   >
-                    <span className="text-primary">{procedure.icon}</span>
+                    <span className="text-primary">
+                      {iconMap[procedure.id] ? (
+                        <img
+                          src={`/iconos_tratamientos/${iconMap[procedure.id]}`}
+                          alt={procedure.name}
+                          className="h-10 w-10"
+                        />
+                      ) : (
+                        procedure.icon
+                      )}
+                    </span>
                     <span className="text-xs text-center font-medium">{procedure.name}</span>
                 </Button>
               ))}

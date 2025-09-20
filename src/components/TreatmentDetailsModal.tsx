@@ -14,9 +14,12 @@ interface TreatmentDetailsModalProps {
   onClose: () => void;
   toothNumber: number;
   procedures: Procedure[];
+  onDeleteProcedure?: (index: number) => void;
+  onUpdateProcedureStatus?: (index: number, status: 'diagnostico' | 'realizado' | 'pendiente') => void;
+  onDeleteProcedureSegment?: (index: number, segment: 'oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal') => void;
 }
 
-export function TreatmentDetailsModal({ isOpen, onClose, toothNumber, procedures }: TreatmentDetailsModalProps) {
+export function TreatmentDetailsModal({ isOpen, onClose, toothNumber, procedures, onDeleteProcedure, onUpdateProcedureStatus, onDeleteProcedureSegment }: TreatmentDetailsModalProps) {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'diagnostico':
@@ -86,29 +89,74 @@ export function TreatmentDetailsModal({ isOpen, onClose, toothNumber, procedures
                     </span>
                   </div>
                 </div>
-                {procedure.date && (
-                  <div className="text-sm text-gray-500">
-                    {format(new Date(procedure.date), "PPP", { locale: es })}
-                  </div>
-                )}
+                <div className="flex items-center gap-2">
+                  {procedure.date && (
+                    <div className="text-sm text-gray-500">
+                      {format(new Date(procedure.date), "PPP", { locale: es })}
+                    </div>
+                  )}
+                  {onDeleteProcedure && (
+                    <button
+                      className="text-red-600 text-xs border border-red-200 px-2 py-1 rounded hover:bg-red-50"
+                      onClick={() => {
+                        if (window.confirm('¿Eliminar este tratamiento completo? Esta acción no se puede deshacer.')) {
+                          onDeleteProcedure(index);
+                        }
+                      }}
+                      title="Eliminar tratamiento"
+                    >
+                      Eliminar
+                    </button>
+                  )}
+                </div>
               </div>
-              
+
               {procedure.segments && procedure.segments.length > 0 && (
                 <div className="mt-3">
                   <h4 className="text-sm font-medium text-gray-700 mb-1">Caras tratadas:</h4>
                   <div className="flex flex-wrap gap-2">
                     {procedure.segments.map((segment, segIndex) => (
-                      <span 
-                        key={segIndex}
-                        className="text-xs bg-gray-100 px-2 py-1 rounded"
-                      >
-                        {segment === 'oclusal' ? 'Oclusal' : 
-                         segment === 'vestibular' ? 'Vestibular' :
-                         segment === 'lingual' ? 'Lingual' :
-                         segment === 'mesial' ? 'Mesial' : 'Distal'}
-                      </span>
+                      <div key={segIndex} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
+                        <span className="text-xs">
+                          {segment === 'oclusal' ? 'Oclusal' : 
+                           segment === 'vestibular' ? 'Vestibular' :
+                           segment === 'lingual' ? 'Lingual' :
+                           segment === 'mesial' ? 'Mesial' : 'Distal'}
+                        </span>
+                        {onDeleteProcedureSegment && (
+                          <button
+                            className="text-red-600 text-[10px] leading-none border border-red-200 rounded px-1 hover:bg-red-50"
+                            title="Eliminar esta cara"
+                            onClick={() => {
+                              if (window.confirm('¿Eliminar esta cara del tratamiento?')) {
+                                onDeleteProcedureSegment(index, segment as any);
+                              }
+                            }}
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Controles de estado */}
+              {onUpdateProcedureStatus && (
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="text-xs text-gray-600">Cambiar estado:</span>
+                  {(['diagnostico','pendiente','realizado'] as const).map(s => (
+                    <button
+                      key={s}
+                      className={`text-xs px-2 py-1 rounded border transition-colors ${
+                        procedure.status === s ? 'bg-blue-600 text-white border-blue-700' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                      onClick={() => onUpdateProcedureStatus(index, s)}
+                    >
+                      {getStatusLabel(s)}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

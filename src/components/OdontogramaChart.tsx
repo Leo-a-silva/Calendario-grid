@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ToothComponent } from "./ToothComponent";
 import { SegmentSelectionModal } from "./SegmentSelectionModal";
 import { QuadrantSelectionModal } from "./QuadrantSelectionModal";
 import { WorkTypeModal } from "./WorkTypeModal";
 import { TreatmentSelectionModal } from "./TreatmentSelectionModal";
+import { TreatmentDetailsModal } from "./TreatmentDetailsModal";
 import { ToothAreaSelectionModal } from "./ToothAreaSelectionModal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,6 +33,7 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
   const [isWorkTypeModalOpen, setIsWorkTypeModalOpen] = useState(false);
   const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
   const [isAreaSelectionModalOpen, setIsAreaSelectionModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedWorkType, setSelectedWorkType] = useState<'pendiente' | 'realizado' | 'diagnostico' | null>(null);
   const [toothStates, setToothStates] = useState<{ [key: number]: ToothState }>({});
   const [selectedProcedure, setSelectedProcedure] = useState<string | null>(null);
@@ -42,10 +44,78 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
     pendientes: true
   });
 
+  // Clave de almacenamiento por paciente y tipo de dentición
+  const storageKey = useMemo(
+    () => `odontograma:${pacienteId ?? 'default'}:${denticionType}`,
+    [pacienteId, denticionType]
+  );
+
+  // Cargar desde localStorage cuando cambia la clave (paciente/dentición)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        // Revivir fechas si existieran
+        const revived = Object.fromEntries(
+          Object.entries(parsed).map(([tooth, state]: any) => {
+            const procedures = (state.procedures || []).map((p: any) => ({
+              ...p,
+              date: p.date ? new Date(p.date) : undefined,
+            }));
+            return [Number(tooth), { ...state, procedures }];
+          })
+        );
+        setToothStates(revived);
+      } else {
+        setToothStates({});
+      }
+    } catch (e) {
+      console.error('Error loading odontograma from localStorage', e);
+    }
+  }, [storageKey]);
+
+  // Guardar en localStorage cuando cambien los estados
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(toothStates));
+    } catch (e) {
+      console.error('Error saving odontograma to localStorage', e);
+    }
+  }, [storageKey, toothStates]);
+
   // Números de dientes según el tipo de dentición
   const permanentTeeth = {
     superior: [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28],
     inferior: [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38]
+  };
+
+  // Eliminar una cara (segmento) específica de un procedimiento; si queda sin segmentos, eliminar el procedimiento
+  const deleteProcedureSegmentAtIndex = (
+    index: number,
+    segment: 'oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal'
+  ) => {
+    if (selectedTooth == null) return;
+    setToothStates(prev => {
+      const currentTooth = prev[selectedTooth];
+      if (!currentTooth) return prev;
+      const proc = currentTooth.procedures[index];
+      if (!proc) return prev;
+      const newSegments = proc.segments.filter(s => s !== segment);
+      let updatedProcedures;
+      if (newSegments.length === 0) {
+        // eliminar el procedimiento completo si se quedaron sin segmentos
+        updatedProcedures = currentTooth.procedures.filter((_, i) => i !== index);
+      } else {
+        updatedProcedures = currentTooth.procedures.map((p, i) =>
+          i === index ? { ...p, segments: newSegments, date: new Date() } : p
+        );
+      }
+      return {
+        ...prev,
+        [selectedTooth]: { ...currentTooth, procedures: updatedProcedures }
+      };
+    });
   };
 
   const primaryTeeth = {
@@ -233,6 +303,42 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
     handleTreatmentSelect(selectedProcedure);
   };
 
+  // Abrir detalles del diente seleccionado
+  const openDetailsForSelectedTooth = () => {
+    if (!selectedTooth) return;
+    setIsDetailsModalOpen(true);
+  };
+
+  // Eliminar procedimiento por índice
+  const deleteProcedureAtIndex = (index: number) => {
+    if (selectedTooth == null) return;
+    setToothStates(prev => {
+      const currentTooth = prev[selectedTooth];
+      if (!currentTooth) return prev;
+      const updated = currentTooth.procedures.filter((_, i) => i !== index);
+      return {
+        ...prev,
+        [selectedTooth]: { ...currentTooth, procedures: updated }
+      };
+    });
+  };
+
+  // Cambiar estado del procedimiento
+  const updateProcedureStatusAtIndex = (index: number, status: 'diagnostico' | 'realizado' | 'pendiente') => {
+    if (selectedTooth == null) return;
+    setToothStates(prev => {
+      const currentTooth = prev[selectedTooth];
+      if (!currentTooth) return prev;
+      const updated = currentTooth.procedures.map((p, i) =>
+        i === index ? { ...p, status, date: new Date() } : p
+      );
+      return {
+        ...prev,
+        [selectedTooth]: { ...currentTooth, procedures: updated }
+      };
+    });
+  };
+
   const procedures = [
     { id: 'diagnostico', name: 'Diagnóstico', icon: '🔍' },
     { id: 'limpieza', name: 'Limpieza', icon: '✨' },
@@ -255,6 +361,30 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
     { id: 'fluor', name: 'Flúor', icon: '💧' },
     { id: 'frenectomia', name: 'Frenectomía', icon: '✂️' }
   ];
+
+  // Iconos desde public/Iconos tratamientos
+  const iconMap: Record<string, string> = {
+    diagnostico: "diagnosticos.svg",
+    limpieza: "limpieza.svg",
+    obturacion: "obstruccion.svg",
+    extraccion: "extraccion.svg",
+    blanqueamiento: "blanqueamiento.svg",
+    radiografias: "radiografia.svg",
+    selladores: "selladores.svg",
+    endodoncia: "endodoncia.svg",
+    implantes: "implantes.svg",
+    coronas: "coronas.svg",
+    puentes: "puentes.svg",
+    carillas: "carillas.svg",
+    apicectomia: "apicectomia.svg",
+    prostodoncia: "prostodoncia.svg",
+    cirugia: "cirugia_maxilofacial.svg",
+    ortodoncia: "ortodoncia.svg",
+    placa: "placa_antibruxismo.svg",
+    periodoncia: "periodoncia.svg",
+    fluor: "fluor.svg",
+    frenectomia: "frenectomia.svg",
+  };
 
   return (
     <div className="space-y-6">
@@ -328,6 +458,9 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
                       onSegmentClick={handleSegmentClick}
                       onNumberClick={handleNumberClick}
                       isSelected={selectedTooth === toothNumber}
+                      onDeleteProcedure={deleteProcedureAtIndex}
+                      onUpdateProcedureStatus={updateProcedureStatusAtIndex}
+                      onDeleteProcedureSegment={deleteProcedureSegmentAtIndex}
                     />
                   ))}
                 </div>
@@ -350,6 +483,8 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
                       onSegmentClick={handleSegmentClick}
                       onNumberClick={handleNumberClick}
                       isSelected={selectedTooth === toothNumber}
+                      onDeleteProcedure={deleteProcedureAtIndex}
+                      onUpdateProcedureStatus={updateProcedureStatusAtIndex}
                     />
                   ))}
                 </div>
@@ -378,6 +513,8 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
                       onSegmentClick={handleSegmentClick}
                       onNumberClick={handleNumberClick}
                       isSelected={selectedTooth === toothNumber}
+                      onDeleteProcedure={deleteProcedureAtIndex}
+                      onUpdateProcedureStatus={updateProcedureStatusAtIndex}
                     />
                   ))}
                 </div>
@@ -400,6 +537,8 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
                       onSegmentClick={handleSegmentClick}
                       onNumberClick={handleNumberClick}
                       isSelected={selectedTooth === toothNumber}
+                      onDeleteProcedure={deleteProcedureAtIndex}
+                      onUpdateProcedureStatus={updateProcedureStatusAtIndex}
                     />
                   ))}
                 </div>
@@ -423,7 +562,17 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
                 }`}
                 onClick={() => handleProcedureSelect(procedure.id)}
               >
-                <span className="text-xs sm:text-sm">{procedure.icon}</span>
+                <span className="text-xs sm:text-sm">
+                  {iconMap[procedure.id] ? (
+                    <img
+                      src={`/iconos_tratamientos/${iconMap[procedure.id]}`}
+                      alt={procedure.name}
+                      className="h-10 w-10"
+                    />
+                  ) : (
+                    procedure.icon
+                  )}
+                </span>
               </button>
               <span className="text-xs text-center font-medium text-gray-700 leading-tight">
                 {procedure.name}
@@ -480,6 +629,7 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
         onAreaSelect={handleAreaSelect}
         toothNumber={selectedTooth || 0}
       />
+
     </div>
   );
 }

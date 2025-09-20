@@ -16,6 +16,9 @@ interface ToothComponentProps {
   onSegmentClick: (toothNumber: number, segment: string) => void;
   onNumberClick: (toothNumber: number) => void;
   isSelected?: boolean;
+  onDeleteProcedure?: (index: number) => void;
+  onUpdateProcedureStatus?: (index: number, status: 'diagnostico' | 'realizado' | 'pendiente') => void;
+  onDeleteProcedureSegment?: (index: number, segment: 'oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal') => void;
 }
 
 export function ToothComponent({ 
@@ -24,7 +27,10 @@ export function ToothComponent({
   onClick, 
   onSegmentClick, 
   onNumberClick,
-  isSelected = false 
+  isSelected = false,
+  onDeleteProcedure,
+  onUpdateProcedureStatus,
+  onDeleteProcedureSegment,
 }: ToothComponentProps) {
   const [showDetails, setShowDetails] = useState(false);
 
@@ -204,6 +210,9 @@ export function ToothComponent({
           onClose={() => setShowDetails(false)}
           toothNumber={number}
           procedures={procedures}
+          onDeleteProcedure={onDeleteProcedure}
+          onUpdateProcedureStatus={onUpdateProcedureStatus}
+          onDeleteProcedureSegment={onDeleteProcedureSegment}
         />
       )}
       

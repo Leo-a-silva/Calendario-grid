@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { 
   Dialog, 
@@ -196,6 +196,22 @@ export function AppointmentModal({ open, onOpenChange, initialDate, initialTime 
       hora: null,
     },
   });
+
+  // Prefill fecha y hora cuando el modal se abre desde el padre
+  useEffect(() => {
+    if (open) {
+      if (initialDate) {
+        form.setValue('fecha', initialDate);
+      }
+      if (initialTime) {
+        const [hours, minutes] = initialTime.split(':');
+        const timeDate = new Date();
+        timeDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        form.setValue('hora', timeDate);
+      }
+    }
+    // no limpiar aquí para no interferir con el flujo; se limpia en handleOpenChange(false)
+  }, [open, initialDate, initialTime]);
 
   // Reset modal state when opening/closing
   const handleOpenChange = (openState: boolean) => {

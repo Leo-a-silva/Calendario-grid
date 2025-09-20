@@ -54,7 +54,8 @@ export default function Agenda() {
   };
 
   const handleNewAppointmentClick = () => {
-    setModalInitialDate(undefined);
+    // Prefill with the currently selected day; time remains empty
+    setModalInitialDate(selectedDate);
     setModalInitialTime(undefined);
     setAppointmentModalOpen(true);
   };

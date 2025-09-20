@@ -1,14 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  FileSearch, 
-  Sparkles, 
-  FileX, 
-  Scissors, 
-  Activity, 
-  Crown 
-} from "lucide-react";
+// Iconos ahora provienen de public/Iconos tratamientos
 
 interface ProcedurePanelProps {
   selectedProcedure: 'diagnostico' | 'limpieza' | 'obturacion' | 'extraccion' | 'endodoncia' | 'corona';
@@ -16,13 +9,23 @@ interface ProcedurePanelProps {
 }
 
 export function ProcedurePanel({ selectedProcedure, onProcedureSelect }: ProcedurePanelProps) {
+  // Mapa de iconos desde public/Iconos tratamientos
+  const iconMap: Record<string, string> = {
+    diagnostico: "diagnosticos.svg",
+    limpieza: "limpieza.svg",
+    obturacion: "obstruccion.svg",
+    extraccion: "extraccion.svg",
+    endodoncia: "endodoncia.svg",
+    corona: "coronas.svg",
+  };
+
   const procedures = [
-    { id: 'diagnostico' as const, name: 'Diagnóstico', icon: <FileSearch className="h-6 w-6" />, color: 'bg-blue-500' },
-    { id: 'limpieza' as const, name: 'Limpieza', icon: <Sparkles className="h-6 w-6" />, color: 'bg-green-500' },
-    { id: 'obturacion' as const, name: 'Obturación', icon: <FileX className="h-6 w-6" />, color: 'bg-yellow-500' },
-    { id: 'extraccion' as const, name: 'Extracción', icon: <Scissors className="h-6 w-6" />, color: 'bg-red-500' },
-    { id: 'endodoncia' as const, name: 'Endodoncia', icon: <Activity className="h-6 w-6" />, color: 'bg-purple-500' },
-    { id: 'corona' as const, name: 'Corona', icon: <Crown className="h-6 w-6" />, color: 'bg-orange-500' },
+    { id: 'diagnostico' as const, name: 'Diagnóstico', color: 'bg-blue-500' },
+    { id: 'limpieza' as const, name: 'Limpieza', color: 'bg-green-500' },
+    { id: 'obturacion' as const, name: 'Obturación', color: 'bg-yellow-500' },
+    { id: 'extraccion' as const, name: 'Extracción', color: 'bg-red-500' },
+    { id: 'endodoncia' as const, name: 'Endodoncia', color: 'bg-purple-500' },
+    { id: 'corona' as const, name: 'Corona', color: 'bg-orange-500' },
   ];
 
   return (
@@ -43,7 +46,15 @@ export function ProcedurePanel({ selectedProcedure, onProcedureSelect }: Procedu
               }`}
               onClick={() => onProcedureSelect(procedure.id)}
               >
-                <span className="text-primary">{procedure.icon}</span>
+                <span className="text-primary">
+                  {iconMap[procedure.id] && (
+                    <img
+                      src={`/iconos_tratamientos/${iconMap[procedure.id]}`}
+                      alt={procedure.name}
+                      className="h-10 w-10"
+                    />
+                  )}
+                </span>
                 <span className="text-xs">{procedure.name}</span>
             </Button>
           ))}
