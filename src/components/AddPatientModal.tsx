@@ -171,48 +171,24 @@ export const AddPatientModal = ({ open, onOpenChange }: AddPatientModalProps) =>
               />
 
               <FormField
-                control={form.control}
-                name="fechaNacimiento"
-                rules={{ required: "La fecha de nacimiento es requerida" }}
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel className="text-sm font-medium text-gray-700">Fecha de Nacimiento</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full h-10 pl-3 text-left font-normal justify-start bg-white border-gray-300 hover:bg-gray-50",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(new Date(field.value), "PPP", { locale: es })
-                            ) : (
-                              <span>Seleccione una fecha</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value ? new Date(field.value) : undefined}
-                          onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage className="text-xs text-red-500" />
-                  </FormItem>
-                )}
-              />
-
+  control={form.control}
+  name="fechaNacimiento"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel className="text-sm font-medium text-gray-700">
+        Fecha de Nacimiento
+      </FormLabel>
+      <FormControl>
+        <Input
+          type="date"
+          {...field}
+          className="w-full h-10 px-3 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </FormControl>
+      <FormMessage className="text-xs text-red-500" />
+    </FormItem>
+  )}
+/>
               <FormField
                 control={form.control}
                 name="sexo"
