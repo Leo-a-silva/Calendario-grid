@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+ import { useCallback } from "react";
 import { ToothComponent } from "./ToothComponent";
 import { SegmentSelectionModal } from "./SegmentSelectionModal";
 import { QuadrantSelectionModal } from "./QuadrantSelectionModal";
@@ -10,6 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+ import { VoiceAssistant } from "./VoiceAssistant";
+ 
+ interface DentalCommand {
+   action: 'apply_treatment' | 'remove_treatment' | 'change_status' | 'unknown';
+   toothNumber: number | null;
+   treatment: string | null;
+   area: string | null;
+   status: 'diagnostico' | 'pendiente' | 'realizado' | null;
+   confidence: number;
+   message: string;
+ }
 
 export interface ToothState {
   number: number;
@@ -43,6 +55,7 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
     realizados: true,
     pendientes: true
   });
+   const [showVoiceAssistant, setShowVoiceAssistant] = useState(true);
 
   // Clave de almacenamiento por paciente y tipo de dentición
   const storageKey = useMemo(
@@ -386,11 +399,183 @@ export function OdontogramaChart({ denticionType, pacienteId }: OdontogramaChart
     frenectomia: "frenectomia.svg",
   };
 
+   // Get all available teeth numbers
+   const allTeethNumbers = useMemo(() => {
+     return [...teethNumbers.superior, ...teethNumbers.inferior];
+   }, [teethNumbers]);
+ 
+   // Get all treatment IDs
+   const treatmentIds = useMemo(() => {
+     return procedures.map(p => p.id);
+   }, []);
+ 
+   // Handle voice command
+   const handleVoiceCommand = useCallback((command: DentalCommand) => {
+     if (command.action === 'unknown' || !command.toothNumber) {
+       return;
+     }
+ 
+     // Validate tooth number
+     if (!allTeethNumbers.includes(command.toothNumber)) {
+       toast({
+         title: "Diente no válido",
+         description: `El diente ${command.toothNumber} no existe en la dentición actual`,
+         variant: "destructive"
+       });
+       return;
+     }
+ 
+     if (command.action === 'apply_treatment' && command.treatment) {
+       // Validate treatment
+       const validTreatment = procedures.find(p => 
+         p.id === command.treatment || 
+         p.name.toLowerCase() === command.treatment?.toLowerCase()
+       );
+ 
+       if (!validTreatment) {
+         toast({
+           title: "Tratamiento no encontrado",
+           description: `No se encontró el tratamiento: ${command.treatment}`,
+           variant: "destructive"
+         });
+         return;
+       }
+ 
+       const treatmentId = validTreatment.id;
+       const toothNumber = command.toothNumber;
+       const status = command.status || 'diagnostico';
+       
+       // Determine segments to apply
+       const segmentsToApply: ('oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal')[] = command.area 
+         ? [command.area as 'oclusal' | 'vestibular' | 'lingual' | 'mesial' | 'distal']
+         : ['oclusal', 'vestibular', 'lingual', 'mesial', 'distal'];
+ 
+       // Apply the treatment
+       setToothStates(prev => {
+         const currentTooth = prev[toothNumber] || { number: toothNumber, procedures: [] };
+         
+         // Check if procedure already exists
+         const existingProcedureIndex = currentTooth.procedures.findIndex(
+           p => p.type === treatmentId && p.status === status
+         );
+ 
+         let updatedProcedures;
+         
+         if (existingProcedureIndex >= 0) {
+           const existingProcedure = currentTooth.procedures[existingProcedureIndex];
+           const combinedSegments = [...new Set([...existingProcedure.segments, ...segmentsToApply])];
+           
+           updatedProcedures = [...currentTooth.procedures];
+           updatedProcedures[existingProcedureIndex] = {
+             ...existingProcedure,
+             segments: combinedSegments,
+             date: new Date()
+           };
+         } else {
+           updatedProcedures = [
+             ...currentTooth.procedures,
+             {
+               type: treatmentId as any,
+               status,
+               segments: segmentsToApply,
+               date: new Date()
+             }
+           ];
+         }
+ 
+         return {
+           ...prev,
+           [toothNumber]: {
+             ...currentTooth,
+             procedures: updatedProcedures
+           }
+         };
+       });
+ 
+       toast({
+         title: "✓ Tratamiento aplicado por voz",
+         description: `${validTreatment.name} aplicado ${command.area ? `en ${command.area}` : ''} del diente ${toothNumber} como ${status}`,
+       });
+     } else if (command.action === 'change_status' && command.status) {
+       // Change status of existing procedures
+       setToothStates(prev => {
+         const currentTooth = prev[command.toothNumber!];
+         if (!currentTooth || currentTooth.procedures.length === 0) {
+           toast({
+             title: "Sin tratamientos",
+             description: `El diente ${command.toothNumber} no tiene tratamientos para modificar`,
+             variant: "destructive"
+           });
+           return prev;
+         }
+ 
+         const updated = currentTooth.procedures.map(p => ({
+           ...p,
+           status: command.status!,
+           date: new Date()
+         }));
+ 
+         return {
+           ...prev,
+           [command.toothNumber!]: { ...currentTooth, procedures: updated }
+         };
+       });
+     } else if (command.action === 'remove_treatment') {
+       // Remove treatments from tooth
+       setToothStates(prev => {
+         const currentTooth = prev[command.toothNumber!];
+         if (!currentTooth) return prev;
+ 
+         let updatedProcedures = currentTooth.procedures;
+ 
+         if (command.treatment) {
+           // Remove specific treatment
+           updatedProcedures = currentTooth.procedures.filter(
+             p => p.type !== command.treatment
+           );
+         } else {
+           // Remove all treatments
+           updatedProcedures = [];
+         }
+ 
+         return {
+           ...prev,
+           [command.toothNumber!]: { ...currentTooth, procedures: updatedProcedures }
+         };
+       });
+ 
+       toast({
+         title: "Tratamiento eliminado",
+         description: `Se eliminó el tratamiento del diente ${command.toothNumber}`,
+       });
+     }
+   }, [allTeethNumbers, procedures]);
+ 
   return (
     <div className="space-y-6">
+       {/* Voice Assistant Panel */}
+       {showVoiceAssistant && (
+         <VoiceAssistant
+           onCommand={handleVoiceCommand}
+           availableTreatments={treatmentIds}
+           availableTeeth={allTeethNumbers}
+           className="mb-4"
+         />
+       )}
+ 
       {/* Responsive header with filters */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-        <h2 className="text-xl font-bold">Odontograma</h2>
+         <div className="flex items-center gap-4">
+           <h2 className="text-xl font-bold">Odontograma</h2>
+           <Button
+             variant={showVoiceAssistant ? "default" : "outline"}
+             size="sm"
+             onClick={() => setShowVoiceAssistant(!showVoiceAssistant)}
+             className="gap-2"
+           >
+             🎤 {showVoiceAssistant ? "Ocultar asistente" : "Asistente de voz"}
+           </Button>
+         </div>
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
           <div className="flex flex-wrap items-center gap-4">
